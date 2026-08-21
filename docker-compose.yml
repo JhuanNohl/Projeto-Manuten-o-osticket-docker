@@ -1,0 +1,71 @@
+# ============================================================================
+#  osTicket ZKTeco — Docker Compose (dev + base para produção)
+#  Serviços separados: app (PHP+Apache) e db (MariaDB).
+#  Segredos ficam no .env (NÃO versionar o .env).
+# ============================================================================
+
+# Nome do projeto fixo — independe do nome/local da pasta. Sem isso, o Compose
+# deriva o nome do diretório e renomear a pasta troca o volume/rede usados
+# (risco de "perder" o banco ao apenas renomear a pasta do projeto).
+name: osticket-zkteco
+
+services:
+  db:
+    image: mariadb:10.6
+    container_name: osticket-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    # Charset/collation iguais ao XAMPP (utf8 / utf8_general_ci) — evita
+    # problemas de acentuação em português.
+    command: >
+      --character-set-server=utf8
+      --collation-server=utf8_general_ci
+    volumes:
+      # Dados do banco (persistem entre reinícios) — volume gerenciado.
+      - db_data:/var/lib/mysql
+      # Restauração automática do dump no PRIMEIRO up (volume vazio).
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      - osticket-net
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: osticket-zkteco:1.17.8
+    container_name: osticket-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Credenciais lidas pelo include/ost-config.php via getenv().
+      OST_DBHOST: db
+      OST_DBNAME: ${DB_NAME}
+      OST_DBUSER: ${DB_USER}
+      OST_DBPASS: ${DB_PASSWORD}
+    ports:
+      - "${APP_PORT}:80"
+    volumes:
+      # -------- DESENVOLVIMENTO --------
+      # Edição ao vivo das customizações (mapeia a pasta local ./app).
+      # Para PRODUÇÃO: comente a linha abaixo e use a imagem autocontida
+      # (o Dockerfile já COPIA ./app para dentro da imagem).
+      - ./app:/var/www/html
+    networks:
+      - osticket-net
+
+volumes:
+  db_data:
+
+networks:
+  osticket-net:

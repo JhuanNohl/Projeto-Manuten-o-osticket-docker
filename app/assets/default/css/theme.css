@@ -1,0 +1,2587 @@
+html {
+  font-size: 100%;
+  overflow-y: scroll;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.231;
+  padding: 0;
+}
+body,
+input,
+select,
+textarea {
+  font-family: "Helvetica Neue", sans-serif;
+  color: #000;
+}
+b,
+strong {
+  font-weight: bold;
+}
+blockquote {
+  margin: 1em 40px;
+}
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+small {
+  font-size: 85%;
+}
+ul,
+ol {
+  margin: 1em 0;
+  padding: 0 0 0 30px;
+}
+img {
+  border: 0;
+  vertical-align: middle;
+}
+form {
+  margin: 0;
+}
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+label {
+  cursor: pointer;
+}
+input,
+select,
+textarea {
+  font-size: 100%;
+  margin: 0;
+  vertical-align: baseline;
+  *vertical-align: middle;
+}
+input {
+  line-height: normal;
+  *overflow: visible;
+}
+table input {
+  *overflow: auto;
+}
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  cursor: pointer;
+  -webkit-appearance: button;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box;
+}
+
+textarea {
+  overflow: auto;
+  vertical-align: top;
+  resize: vertical;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+th,
+td {
+  vertical-align: top;
+}
+th {
+  text-align: left;
+  font-weight: normal;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+form,
+fieldset {
+  margin: 0;
+  padding: 0;
+}
+/* Typography */
+a, .link {
+  color: #0072bc;
+  text-decoration: none;
+  display: inline;
+  margin-bottom: 1px;
+}
+a:hover, .link:hover {
+    border-bottom: 1px dotted #0072bc;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+h1 {
+  color: #00AEEF;
+  font-weight: normal;
+  font-size: 20px;
+}
+h3 {
+  font-size: 16px;
+}
+h2, .subject {
+  font-size: 16px;
+  color: black;
+}
+/* Helpers */
+.centered {
+  text-align: center;
+}
+.clear {
+  clear: both;
+  height: 1px;
+  visibility: none;
+}
+.hidden {
+  display: none;
+}
+.faded {
+  color: #666;
+}
+/* Pagination */
+#pagination {
+  border: 0;
+  margin: 0 0 40px 0;
+  padding: 0;
+}
+#pagination li {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  list-style: none;
+  display: inline;
+}
+#pagination li a {
+  margin-right: 2px;
+  display: block;
+  float: left;
+  padding: 3px 6px;
+  text-decoration: none;
+}
+#pagination li a:hover {
+  color: #ff0084;
+}
+#pagination .previousOff,
+#pagination .nextOff {
+  color: #666;
+  display: block;
+  float: left;
+  font-weight: bold;
+  padding: 3px 4px;
+}
+#pagination .next a,
+#pagination .previous a {
+  font-weight: bold;
+}
+#pagination .active {
+  color: #000;
+  font-weight: bold;
+  margin-right: 2px;
+  display: block;
+  float: left;
+  padding: 3px 6px;
+  text-decoration: none;
+}
+/* Alerts & Notices */
+#msg_notice {
+  margin: 0;
+  padding: 5px 10px 5px 36px;
+  height: 16px;
+  line-height: 16px;
+  margin-bottom: 10px;
+  border: 1px solid #0a0;
+  background: url('../images/icons/ok.png') 10px 50% no-repeat #e0ffe0;
+}
+#msg_warning, .warning-banner {
+  margin: 0;
+  padding: 5px 10px 5px 36px;
+  height: 16px;
+  line-height: 16px;
+  margin-bottom: 10px;
+  border: 1px solid #f26522;
+  background: url('../images/icons/alert.png') 10px 50% no-repeat #ffffdd;
+}
+#msg_error {
+  margin: 0;
+  padding: 5px 10px 5px 36px;
+  height: 16px;
+  line-height: 16px;
+  margin-bottom: 10px;
+  border: 1px solid #a00;
+  background: url('../images/icons/error.png') 10px 50% no-repeat #fff0f0;
+}
+#msg_info { margin: 0; padding: 5px; margin-bottom: 10px; color: #3a87ad; border: 1px solid #bce8f1;  background-color: #d9edf7; }
+.warning {
+  background: #ffc;
+  font-style: italic;
+}
+.warning strong {
+  text-transform: uppercase;
+  color: #a00;
+  font-style: normal;
+}
+.error {
+  color: #f00;
+}
+.error input {
+  border: 1px solid #f00;
+}
+.button,
+.button:visited {
+  background: #222;
+  border: none;
+  display: inline-block;
+  font-size: 16px;
+  padding: 4px 16px 4px 16px;
+  max-width: 220px;
+  text-align: center;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  position: relative;
+  cursor: pointer;
+  font-family: helvetica, arial, sans-serif;
+}
+.button:hover {
+  background-color: #111;
+  color: #fff;
+}
+.button:active {
+  top: 1px;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+}
+.button,
+.button:visited,
+.green.button,
+.green.button:visited {
+  background-color: #91bd09;
+}
+.green.button:hover {
+  background-color: #749a02;
+}
+.blue.button,
+.blue.button:visited {
+  background-color: #00AEEF;
+}
+.blue.button:hover {
+  background-color: #0299d2;
+}
+body {
+  background: url('../images/page_bg.png') top left repeat-x #c8c8c8;
+}
+#container {
+  background: #fff;
+  width: 840px;
+  margin: 0 auto;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+}
+#header {
+  position: relative;
+  height: 71px;
+  padding: 0 20px;
+}
+#logo {
+    height: 100%;
+}
+#header #logo img {
+  max-height: 65px;
+  max-width: 380px;
+  width: auto;
+  height: auto;
+  vertical-align: middle;
+}
+.valign-helper {
+    height: 100%;
+    display: inline-block;
+    vertical-align: middle;
+}
+#header p {
+  width: 400px;
+  margin: 0;
+  padding: 10px 0 0;
+}
+#nav {
+  margin: 0 20px;
+  padding: 2px 10px;
+  height: 20px;
+  background: url('../images/nav_bg.png') top left repeat-x;
+  border-top: 1px solid #aaa;
+  box-shadow: 0 3px 2px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 3px 2px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 0 3px 2px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+#nav li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: inline;
+}
+#nav li a {
+  display: inline-block;
+  width: auto;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  padding: 0 10px 0 32px;
+  margin-left: 10px;
+  color: #333;
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  background-position: 10px 50%;
+  background-repeat: no-repeat;
+}
+.rtl #nav li a {
+  background-position: right center;
+  background-position: calc(100% - 10px) center;
+  padding-left: 10px;
+  padding-right: 32px;
+  margin-right: 10px;
+  margin-left: 0;
+}
+#nav li a.active,
+#nav li a:hover {
+  background-color: #dbefff;
+  color: #000;
+}
+#nav li a:hover {
+  background-color: #ededed;
+  color: #0054a6;
+}
+#nav li a.home {
+  background-image: url('../images/icons/home.png');
+}
+#nav li a.kb {
+  background-image: url('../images/icons/kb.png');
+}
+#nav li a.new {
+  background-image: url('../images/icons/new.png');
+}
+#nav li a.status {
+  background-image: url('../images/icons/status.png');
+}
+#nav li a.tickets {
+  background-image: url('../images/icons/tix.png');
+}
+#content {
+  padding: 20px 0;
+  margin: 0 20px;
+  height: auto !important;
+  height: 350px;
+  min-height: 350px;
+}
+#footer {
+  text-align: center;
+  font-size: 11px;
+  color: #333;
+}
+#footer a {
+  color: #333;
+}
+#footer p {
+  margin: 10px 0 0 0;
+}
+#footer #poweredBy {
+  display: block;
+  width: 126px;
+  height: 23px;
+  outline: none;
+  text-indent: -9999px;
+  margin: 0 auto;
+  background: url('../images/poweredby.png') top left no-repeat;
+  background-size: auto 20px;
+}
+.front-page-button {
+}
+.main-content {
+  width: 565px;
+}
+#landing_page #new_ticket {
+  margin-top: 40px;
+  background: url('../images/new_ticket_icon.png') top left no-repeat;
+}
+#landing_page #new_ticket,
+#landing_page #check_status {
+  width: 295px;
+  padding-left: 75px;
+}
+#landing_page #check_status {
+  margin-top: 40px;
+  background: url('../images/check_status_icon.png') top left no-repeat;
+}
+#landing_page h1, #landing_page h2, #landing_page h3 {
+    margin-bottom: 10px;
+}
+/* Landing page FAQ not yet implemented. */
+#faq {
+  clear: both;
+  margin: 0;
+  padding: 5px;
+}
+#faq ol {
+  font-size: 15px;
+  margin-left: 0;
+  padding-left: 0;
+  border-top: 1px solid #ddd;
+}
+#faq ol li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: #999;
+}
+#faq ol li a {
+  display: block;
+  padding: 5px 0;
+  height: auto !important;
+  overflow: hidden;
+  margin: 0;
+  border-bottom: 1px solid #ddd;
+  line-height: 16px;
+  padding-left: 24px;
+  background: url('../images/icons/page.png') 0 50% no-repeat;
+}
+#faq ol li a:hover {
+  background-color: #e9f5ff;
+}
+#faq .article-meta {
+  padding: 5px;
+  background: #fafafa;
+}
+#kb {
+  margin: 2px 0;
+  padding: 5px;
+  overflow: hidden;
+}
+#kb > li {
+  padding: 10px;
+  height: auto !important;
+  overflow: hidden;
+  margin: 0;
+  background: url(../images/kb_category_bg.png) bottom left repeat-x;
+  border-bottom: 1px solid #ddd;
+  display: block;
+}
+#kb > li h4 span {
+  color: #666;
+}
+#kb > li h4 a {
+  font-size: 14px;
+}
+#kb > li > i {
+  display: block;
+  width: 32px;
+  height: 32px;
+  float: left;
+  margin-right: 6px;
+  background: url(../images/kb_large_folder.png) top left no-repeat;
+}
+.featured-category {
+    margin-top: 10px;
+    width: 49.7%;
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: top;
+}
+.category-name {
+    display: inline-block;
+    font-weight: 400;
+    font-size: 120%;
+}
+.featured-category i {
+    color: rgba(0,174,239, 0.8);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    vertical-align: middle;
+}
+.article-headline {
+    margin-left: 34px;
+}
+.rtl .article-headline {
+    margin-left: 0;
+    margin-right: 34px;
+}
+.article-teaser {
+    font-size: 90%;
+    line-height: 1.5em;
+    height: 3em;
+    overflow: hidden;
+}
+.article-title {
+    font-weight: 500;
+}
+.faq-content .article-title {
+    font-size: 17pt;
+    margin-top: 15px;
+}
+#kb-search {
+  padding: 10px 0;
+  overflow: hidden;
+}
+#kb-search div {
+  clear: both;
+  overflow: hidden;
+  padding-top: 5px;
+}
+#kb-search #query {
+  margin: 0;
+  display: inline-block;
+  float: left;
+  width: 200px;
+  margin-right: 5px;
+}
+#kb-search #cid {
+  margin: 0;
+  display: inline-block;
+  float: left;
+  width: 200px;
+  margin-right: 5px;
+  position: relative;
+  top: 2px;
+}
+#kb-search #topic-id {
+  margin: 0;
+  display: inline-block;
+  float: left;
+  width: 410px;
+}
+#kb-search #searchSubmit {
+  margin: 0;
+  display: inline-block;
+  float: left;
+  position: relative;
+  top: 2px;
+}
+#kb-search #breadcrumbs {
+  color: #333;
+  margin-bottom: 15px;
+}
+#kb-search #breadcrumbs #breadcrumbs a {
+  color: #555;
+}
+#ticketForm div.clear,
+#clientLogin div.clear {
+  clear: both;
+  padding: 3px 0;
+  overflow: hidden;
+}
+#ticketForm div label,
+#clientLogin div label {
+  display: block;
+}
+label.required, span.required {
+  font-weight: bold;
+}
+#ticketForm div label.required,
+#clientLogin div label.required {
+  text-align: left;
+}
+#ticketForm div input,
+#clientLogin div input,
+#ticketForm div textarea,
+#clientLogin div textarea {
+  width: auto;
+  border: 1px solid #aaa;
+  background: #fff;
+  display: block;
+}
+#ticketForm div input[type=file],
+#clientLogin div input[type=file] {
+  border: 0;
+}
+#ticketForm div select,
+#clientLogin div select {
+  display: block;
+  float: left;
+}
+#ticketForm div div.captchaRow,
+#clientLogin div div.captchaRow {
+  line-height: 31px;
+}
+#ticketForm div div.captchaRow input,
+#clientLogin div div.captchaRow input {
+  position: relative;
+  top: 6px;
+}
+#ticketForm > table {
+    table-layout: fixed;
+}
+#ticketForm > table td {
+    width: 160px;
+}
+#ticketForm > table td + td {
+    width: auto;
+}
+#ticketForm td textarea,
+#clientLogin td textarea,
+#ticketForm div textarea,
+#clientLogin div textarea {
+  width: 600px;
+}
+#ticketForm td em,
+#clientLogin td em,
+#ticketForm div em,
+#clientLogin div em {
+  color: #777;
+}
+#ticketForm td .captcha,
+#clientLogin td .captcha,
+#ticketForm div .captcha,
+#clientLogin div .captcha {
+  width: 88px;
+  height: 31px;
+  background: #000;
+  display: block;
+  float: left;
+  margin-right: 20px;
+}
+#ticketForm td label.inline,
+#clientLogin td label.inline,
+#ticketForm div label.inline,
+#clientLogin div label.inline {
+  width: auto;
+  padding: 0 10px;
+}
+#ticketForm div.error input,
+#clientLogin div.error input {
+  border: 1px solid #a00;
+}
+#ticketForm div.error label,
+#clientLogin div.error label {
+  color: #a00;
+}
+#ticketTable th {
+  padding-left: 3px;
+  font-weight: normal;
+  text-align: left;
+}
+#ticketTable th.required,
+#ticketTable td.required {
+  font-weight: bold;
+  text-align: left;
+}
+#clientLogin {
+    display: block;
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+  background: url('../images/lock.png?1319655200') 95% 50% no-repeat #f6f6f6;
+}
+.rtl #clientLogin {
+    background-position: 5% 50%;
+}
+#clientLogin .instructions {
+    display:table-cell;
+    padding-left: 2em;
+    padding-right:90px;
+}
+.rtl #clientLogin .instructions {
+    padding-left: 0;
+    padding-right:0;
+    padding-right: 2em;
+    padding-left:90px;
+}
+#clientLogin p {
+  clear: both;
+}
+#clientLogin strong {
+  font-size: 11px;
+  color: #d00;
+  display: block;
+}
+#clientLogin #email,
+#clientLogin #ticketno {
+  margin-right: 0;
+}
+#clientLogin input[type=text],
+#clientLogin input[type=password] {
+    padding: 5px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+#clientLogin input[type=submit] {
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+#reply {
+  margin-top: 5px;
+  padding: 10px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+}
+#reply h2 {
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 2px dotted rgba(0,0,0,0.1);
+}
+#reply > table {
+  width: auto;
+}
+#reply table td {
+  vertical-align: top;
+}
+#reply textarea {
+  width: 628px !important;
+}
+#reply input[type=text],
+#reply #response_options textarea {
+  border: 1px solid #aaa;
+  background: #fff;
+}
+/* Ticket icons */
+.Icon {
+  width: auto;
+  padding-left: 20px;
+  background-position: top left;
+  background-repeat: no-repeat;
+  color: #006699;
+  text-decoration: none;
+}
+.Icon.Ticket {
+  background-image: url('../images/icons/ticket.gif');
+}
+.Icon.webTicket {
+  background-image: url('../images/icons/ticket_source_web.gif');
+}
+.Icon.emailTicket {
+  background-image: url('../images/icons/ticket_source_email.gif');
+}
+.Icon.phoneTicket {
+  background-image: url('../images/icons/ticket_source_phone.gif');
+}
+.Icon.otherTicket, .Icon.apiTicket  {
+  background-image: url('../images/icons/ticket_source_other.gif');
+}
+
+.Icon.attachment {
+  background-image: url('../images/icons/attachment.gif');
+}
+.Icon.file {
+  background-image: url('../images/icons/attachment.gif');
+}
+.Icon.refresh {
+  background-image: url('../images/icons/refresh.gif');
+}
+.Icon.thread {
+  font-weight: bold;
+  font-size: 1em;
+  background-image: url('../images/icons/thread.gif?1319556657');
+}
+#ticketTable {
+  border: 1px solid #aaa;
+  border-left: none;
+  border-bottom: none;
+}
+#ticketTable caption {
+  padding: 5px;
+  text-align: left;
+  color: #000;
+  background: #ddd;
+  border: 1px solid #aaa;
+  border-bottom: none;
+  font-weight: bold;
+}
+#ticketTable th {
+  height: 24px;
+  line-height: 24px;
+  background: #e1f2ff;
+  border: 1px solid #aaa;
+  border-right: none;
+  border-top: none;
+  padding: 0 5px;
+}
+#ticketTable th a {
+  color: #000;
+}
+#ticketTable td {
+  padding: 3px 5px;
+  border: 1px solid #aaa;
+  border-right: none;
+  border-top: none;
+}
+#ticketTable tr.alt td {
+  background: #f9f9f9;
+}
+i.refresh {
+  color: #0a0;
+  font-size: 80%;
+  vertical-align: middle;
+}
+.states small {
+    font-size: 70%;
+}
+.active.state {
+    font-weight: bold;
+}
+.search.well {
+    padding: 10px;
+    background-color: rgba(0,0,0,0.05);
+    margin-bottom: 10px;
+    margin-top: -15px;
+}
+.infoTable {
+  background: #F4FAFF;
+}
+.infoTable th {
+  text-align: left;
+  padding: 3px 8px;
+}
+.action-button {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  color: #777 !important;
+  display: inline-block;
+  border: 1px solid #aaa;
+  cursor: pointer;
+  font-size: 11px;
+  overflow: hidden;
+  background-color: #dddddd;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #efefef), color-stop(100% #dddddd));
+  background-image: -webkit-linear-gradient(top, #efefef 0%, #dddddd 100%);
+  background-image: -moz-linear-gradient(top, #efefef 0%, #dddddd 100%);
+  background-image: -ms-linear-gradient(top, #efefef 0%, #dddddd 100%);
+  background-image: -o-linear-gradient(top, #efefef 0%, #dddddd 100%);
+  background-image: linear-gradient(top, #efefef 0%, #dddddd 100%);
+  padding: 0 5px;
+  text-decoration: none;
+  line-height:18px;
+  margin-left:5px;
+}
+.action-button span,
+.action-button a {
+  color: #777 !important;
+  display: inline-block;
+  float: left;
+}
+.action-button a {
+  color: #777;
+  text-decoration: none;
+}
+table.padded tr > td,
+table.padded tr > th {
+  height: 20px;
+  padding-bottom: 5px;
+}
+
+.external-auth + .external-auth {
+    margin-top: 4px;
+}
+
+a.external-sign-in {
+    text-decoration: none;
+}
+.external-auth-box {
+    vertical-align: middle;
+    border-radius: 4px;
+    border: 1px solid #777;
+}
+.external-auth-icon {
+    display: inline-block;
+    color: #333;
+    width: 30px;
+    padding: 5px 10px;
+    border-right: 1px solid #ddd;
+}
+.external-auth-name {
+    color: #333;
+    width: 100px;
+    padding: 5px 10px;
+    line-height:30px;
+    font-size: 11pt;
+}
+img.sign-in-image {
+    border: none;
+    max-height: 40px;
+    max-width: 200px;
+    width: auto;
+    height: auto;
+}
+.login-box {
+    width:40%;
+    display:table-cell;
+    box-shadow: 12px 0 15px -15px rgba(0,0,0,0.4);
+    padding:15px;
+}
+.rtl .login-box {
+    box-shadow: -12px 0 15px -15px rgba(0,0,0,0.4);
+}
+.flush-right {
+    text-align: right;
+}
+.flush-left {
+    text-align: left;
+}
+.sidebar {
+    margin-bottom: 20px;
+    margin-left: 20px;
+    width: 215px;
+}
+.rtl .sidebar {
+    margin-left: 0;
+    margin-right: 20px;
+}
+.sidebar .content {
+    padding: 10px; border: 1px solid #C8DDFA; background: #F7FBFE;
+}
+.sidebar .content:empty {
+    display: none;
+}
+
+.sidebar section .header {
+    font-weight: bold;
+    margin-bottom: 0.3em;
+}
+.sidebar section + section {
+    margin-top: 15px;
+}
+.search-form {
+    padding-top: 12px;
+}
+.searchbar .search,
+.search-form .search {
+    display: inline-block;
+    width: 400px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+
+.searchbar .search {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+.bleed {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.row {
+}
+.span4 {
+    display: inline-block;
+    width: 29.5%;
+    margin: 0 1%;
+    vertical-align: top;
+}
+.span8 {
+    display: inline-block;
+    width: 66.0%;
+    margin: 0 1%;
+    vertical-align: top;
+}
+.truncate {
+    display: inline-block;
+    width: auto;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
+.image-hover a.action-button:hover,
+.image-hover a.action-button {
+    color: initial !important;
+    text-decoration: none;
+}
+table.custom-data {
+    margin-top: 10px;
+}
+table.custom-data th {
+    width: 25%;
+}
+table.custom-data th {
+    background-color: #F4FAFF;
+    padding: 3px 8px;
+}
+table .headline,
+table.custom-data .headline {
+    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid rgba(0,0,0,0.15);
+    font-weight: bold;
+    background-color: white;
+}
+#ticketInfo h1 {
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+    border-bottom: 2px dotted rgba(0, 0, 0, 0.15);
+}
+#ticketInfo h1 small {
+    font-weight: normal;
+}
+.thread-entry {
+    margin-bottom: 15px;
+}
+.thread-entry.avatar {
+    margin-left: 60px;
+}
+.thread-entry.response.avatar {
+    margin-right: 60px;
+    margin-left: 0;
+}
+.thread-entry > .avatar {
+    margin-left: -60px;
+    display:inline-block;
+    width:48px;
+    height:auto;
+    border-radius: 5px;
+}
+.thread-entry.response > .avatar {
+    margin-left: initial;
+    margin-right: -60px;
+}
+img.avatar {
+    border-radius: inherit;
+}
+.avatar > img.avatar {
+    width: 100%;
+    height: auto;
+}
+.thread-entry .header {
+    padding: 8px 0.9em;
+    border: 1px solid #ccc;
+    border-color: rgba(0,0,0,0.2);
+    border-radius: 5px 5px 0 0;
+}
+.thread-entry.avatar .header:before {
+  position: absolute;
+  top: 7px;
+  right: -8px;
+  content: '';
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #b0b0b0;
+  display: inline-block;
+}
+.thread-entry.avatar .header:after {
+  position: absolute;
+  top: 7px;
+  right: -8px;
+  content: '';
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  display: inline-block;
+  margin-top: 1px;
+}
+
+.thread-entry.avatar .header {
+    position: relative;
+}
+
+.thread-entry.response .header {
+    background:#dddddd;
+}
+.thread-entry.avatar.response .header:after {
+    border-left: 7px solid #dddddd;
+    margin-right: 1px;
+}
+
+.thread-entry.message .header {
+    background:#C3D9FF;
+}
+.thread-entry.avatar.message .header:before {
+    top: 7px;
+    left: -8px;
+    right: initial;
+    border-left: none;
+    border-right: 8px solid #CCC;
+}
+.thread-entry.avatar.message .header:before {
+    border-right-color: #9cadcc;
+}
+.thread-entry.avatar.message .header:after {
+    top: 7px;
+    left: -8px;
+    right: initial;
+    border-left: none;
+    border-right: 7px solid #c3d9ff;
+    margin-left: 1px;
+}
+
+.thread-entry .header .title {
+    max-width: 500px;
+    vertical-align: bottom;
+    display: inline-block;
+    margin-left: 15px;
+}
+
+.thread-entry .thread-body {
+    border: 1px solid #ddd;
+    border-top: none;
+    border-bottom:2px solid #aaa;
+    border-radius: 0 0 5px 5px;
+}
+.thread-body .attachments {
+  background-color: #f4faff;
+  margin: 0 -0.9em;
+  position: relative;
+  top: 0.9em;
+  padding: 0.3em 0.9em;
+  border-top: 1px dotted #ccc;
+  border-top-color: rgba(0,0,0,0.2);
+  border-radius: 0 0 6px 6px;
+}
+.thread-body .attachments .filesize {
+  margin-left: 0.5em;
+}
+.thread-body .attachments a,
+.thread-body .attachments a:hover {
+  text-decoration: none;
+}
+.thread-body .attachment-info {
+    margin-right: 10px;
+    display: inline-block;
+    width: 48%;
+}
+.thread-body .attachment-info .filename {
+  max-width: 80%;
+  max-width: calc(100% - 70px);
+}
+.label {
+  font-size: 11px;
+  padding: 1px 4px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  font-weight: bold;
+  line-height: 14px;
+  color: #ffffff;
+  vertical-align: baseline;
+  white-space: nowrap;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #999999;
+}
+.label-bare {
+  background-color: transparent;
+  background-color: rgba(0,0,0,0);
+  border: 1px solid #999999;
+  color: #999999;
+  text-shadow: none;
+}
+.thread-event {
+    padding: 0px 2px 15px;
+    margin-left: 60px;
+}
+.type-icon {
+    border-radius: 8px;
+    background-color: #f4f4f4;
+    padding: 4px 6px;
+    margin-right: 5px;
+    text-align: center;
+    display: inline-block;
+    font-size: 1.1em;
+    border: 1px solid #eee;
+    vertical-align: top;
+}
+.type-icon.dark {
+    border-color: #666;
+    background-color: #949494;
+}
+.thread-event img.avatar {
+    vertical-align: middle;
+    border-radius: 3px;
+    width: auto;
+    max-height: 24px;
+    margin: -3px 3px 0;
+}
+.thread-event .description {
+    margin-left: -30px;
+    padding-top: 6px;
+    padding-left: 30px;
+    display: inline-block;
+    width: 642px;
+    width: calc(100% - 95px);
+    line-height: 1.4em;
+}
+.thread-event .type-icon {
+  position:relative;
+}
+.thread-event .type-icon::after {
+  content: "";
+  border: 16px solid white;
+  position: absolute;
+  top: -3px;
+  bottom: 0;
+  left: -3px;
+  right: 0;
+  z-index: -1;
+}
+.thread-entry::after {
+  content: "";
+  border-bottom: 2px solid white;
+  display: block;
+}
+.thread-entry::before {
+  content: "";
+  display: block;
+  border-top: 2px solid white;
+}
+#ticketThread::before {
+  border-left: 2px dotted #ddd;
+  border-bottom-color: rgba(0,0,0,0.1);
+  position: absolute;
+  margin-left: 74px;
+  z-index: -1;
+  content: "";
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+#ticketThread {
+  z-index: 0;
+  position: relative;
+  border-bottom: 2px solid #ddd;
+  border-bottom-color: rgba(0,0,0,0.1);
+}
+
+.freetext-files {
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px dotted #ddd;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+}
+.freetext-files .file {
+    margin-right: 10px;
+    display: inline-block;
+    width: 48%;
+    padding-top: 0.2em;
+}
+.freetext-files .title {
+    font-weight: bold;
+    margin-bottom: 0.3em;
+    font-size: 1.1em;
+}
+
+
+/* =====================================================================
+   CAMADA OFICIAL ZKTeco — Portal do Cliente (Sistema de Manutenção)
+   ---------------------------------------------------------------------
+   Bloco ANEXADO ao FINAL de assets/default/css/theme.css. Como é
+   carregado depois de css/osticket.css E de todo o theme.css original,
+   sobrescreve o restante por cascata/especificidade.
+
+   Direção de design vencedora (painel de 3 propostas + júri): "Ficha
+   corporativa densa" — estética de ferramenta de TI. Cabeçalho, menu,
+   corpo e rodapé compartilham UMA única faixa contínua (--zk-col) com
+   bordas laterais, formando um "documento" só (sem caixa flutuando).
+
+   Paleta: #7AC143 verde | #649E37 verde escuro | #474B4F grafite
+           #555555 texto | #f5f7f4 cinza claro | #fff branco
+   Sem CDN / sem fontes externas (CSP) — apenas font stack local.
+   ===================================================================== */
+
+:root{
+  --zk-green:#7AC143;
+  --zk-green-dk:#649E37;
+  --zk-graphite:#474B4F;
+  --zk-text:#555555;
+  --zk-line:#e3e6e2;              /* divisória fina */
+  --zk-line-soft:#eef1ed;
+  --zk-bg-soft:#f5f7f4;          /* cinza muito claro */
+  --zk-col:none;                 /* largura total: sem limite fixo no desktop */
+  --zk-form:100%;                /* formulário largo para a grade de equipamentos */
+  --zk-pad:clamp(18px,2.8vw,46px); /* recuo lateral coerente em todas as faixas */
+  --zk-stack:"Segoe UI",Roboto,"Helvetica Neue",Arial,system-ui,sans-serif;
+  --zk-font-display:"Space Grotesk","Segoe UI",Roboto,Arial,sans-serif; /* títulos/destaques — arquivos locais, ver @font-face abaixo */
+
+  /* ---- Carbon Design System (IBM) — tokens de apoio ----
+     Reto/quadrado nas superfícies (Carbon é "flat"), pílula só nas tags.
+     Cores de tag: gray/green reaproveitam a marca; blue/cyan/purple/yellow/red
+     são o palette de suporte necessário p/ cobrir os estados que a marca (só
+     verde/grafite) não cobre — mesmo princípio do Carbon (cor de marca +
+     paleta de status separada). */
+  --zk-radius:0px;
+  --zk-tag-gray:var(--zk-graphite);
+  --zk-tag-green:var(--zk-green-dk);
+  --zk-tag-blue:#0043ce;
+  --zk-tag-cyan:#007d79;
+  --zk-tag-purple:#6929c4;
+  --zk-tag-yellow:#8a6d00;
+  --zk-tag-red:#da1e28;
+}
+
+/* Space Grotesk (Google Fonts) hospedada localmente em
+   assets/default/fonts/space-grotesk/ — sem chamada a CDN externo,
+   mantendo a política de "sem fontes externas" acima. Usada em
+   --zk-font-display para títulos/destaques específicos. */
+@font-face{
+  font-family:"Space Grotesk"; font-style:normal; font-weight:400;
+  font-display:swap;
+  src:url("../fonts/space-grotesk/space-grotesk-400.woff2") format("woff2");
+}
+@font-face{
+  font-family:"Space Grotesk"; font-style:normal; font-weight:500;
+  font-display:swap;
+  src:url("../fonts/space-grotesk/space-grotesk-500.woff2") format("woff2");
+}
+@font-face{
+  font-family:"Space Grotesk"; font-style:normal; font-weight:600;
+  font-display:swap;
+  src:url("../fonts/space-grotesk/space-grotesk-600.woff2") format("woff2");
+}
+@font-face{
+  font-family:"Space Grotesk"; font-style:normal; font-weight:700;
+  font-display:swap;
+  src:url("../fonts/space-grotesk/space-grotesk-700.woff2") format("woff2");
+}
+
+/* Fonte base coesa (web-safe, sem CDN) e cor de texto ZKTeco. */
+body,
+input,
+select,
+textarea{
+  font-family:var(--zk-stack);
+  color:var(--zk-text);
+}
+body{ background:var(--zk-bg-soft); }
+
+/* Carbon: contorno de foco consistente em qualquer elemento focável. */
+:focus-visible{ outline:2px solid var(--zk-green-dk); outline-offset:2px; }
+
+/* Página sempre preenche a viewport inteira (rodapé fixo embaixo, sem
+   sobra cinza abaixo dele) — evita o efeito "cartão flutuando" em telas
+   com pouco conteúdo (ex.: lista de Chamados vazia/curta). Não afeta
+   páginas longas: o container só "cresce" quando sobra espaço; quando o
+   conteúdo já é mais alto que a viewport, o comportamento é o de sempre. */
+html, body{ height:100%; }
+body{ display:flex; flex-direction:column; min-height:100vh; }
+#container{ flex:1 0 auto; }
+#footer{ flex-shrink:0; }
+
+/* Links genéricos na paleta ZKTeco (o core usa azul #0072bc). */
+a, .link{ color:var(--zk-green-dk); }
+a:hover, .link:hover{ color:var(--zk-green); border-bottom:1px dotted var(--zk-green); }
+
+/* --- CONTAINER: sem sombra/borda flutuante; um "documento" contínuo. -- */
+#container{
+  background:#fff;
+  width:calc(100% - 32px);
+  max-width:var(--zk-col);
+  margin:0 auto;
+  box-shadow:0 1px 0 rgba(71,75,79,.04);
+  border-left:1px solid var(--zk-line);
+  border-right:1px solid var(--zk-line);
+}
+
+/* Barras de aviso globais (renderizadas dentro de #container, acima do
+   header) — alinhadas ao recuo da faixa, sem aparecer cruas. */
+.error_bar,.warning_bar,.notice_bar{
+  padding:11px var(--zk-pad);
+  font-size:13px;
+  border:0;
+}
+.error_bar{ background:#fdecea; color:#a5281b; }
+.warning_bar{ background:#fff7e6; color:#8a5a10; }
+.notice_bar{ background:#eef7e6; color:#3f6c1f; }
+
+/* ===================== CABEÇALHO ===================== */
+#header{
+  height:78px;
+  padding:0 var(--zk-pad);
+  border-top:4px solid var(--zk-green);
+  border-bottom:1px solid var(--zk-line);
+  background:#fff;
+  box-sizing:border-box;
+  position:relative;
+}
+#header #logo{ height:100%; margin:0; }
+#header #logo:hover{ border:0; }
+#header #logo img{
+  max-height:52px;
+  max-width:300px;
+  width:auto; height:auto;
+  vertical-align:middle;
+}
+.valign-helper{ height:100%; display:inline-block; vertical-align:middle; }
+
+/* Nome do sistema, centralizado no cabeçalho (a logo sozinha não deixa
+   claro qual portal é esse — a ZKTeco tem várias frentes/sistemas).
+   Posição absoluta: fica centrado na faixa toda, sem disputar espaço
+   com a logo (esquerda) nem com o bloco de sessão (direita). */
+#header #site-title{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  color:var(--zk-graphite);
+  pointer-events:none;
+}
+@media (max-width:900px){
+  #header #site-title{ display:none; }
+}
+
+/* Transição cabeçalho -> corpo nas telas sem menu (ex.: login). Antes
+   era um <hr> cru (estilo "sulco 3D" padrão do navegador) — agora é só
+   um traço fino e discreto, coerente com o resto do layout. */
+#container > hr{
+  height:1px;
+  border:0;
+  margin:0;
+  background:var(--zk-line);
+}
+
+/* Bloco de sessão (nome | Perfil | Chamados | Sair) discreto. */
+#header .pull-right{ padding-top:0; }
+#header p{
+  width:auto;
+  max-width:440px;
+  margin:0;
+  padding:14px 0 0;
+  font-size:12.5px;
+  color:var(--zk-graphite);
+  line-height:1.5;
+}
+#header p a{
+  color:var(--zk-graphite);
+  font-weight:600;
+}
+#header p a:hover{
+  color:var(--zk-green-dk);
+  border-bottom:1px solid var(--zk-green-dk);
+}
+
+/* ===================== NAVEGAÇÃO ===================== */
+/* Nav grafite integrada por continuidade: mesma faixa/recuo do header,
+   sem cantos flutuantes. Aba ativa/hover em verde. */
+.clear{ clear:both; height:0; }
+#nav{
+  padding:0 var(--zk-pad);
+  height:auto;
+  background:var(--zk-graphite);
+  border:0;
+  box-shadow:inset 0 -3px 0 var(--zk-green);
+  white-space:nowrap;
+  box-sizing:border-box;
+  overflow-x:auto;
+}
+#nav li{ margin:0; padding:0; list-style:none; display:inline-block; }
+#nav li a,
+#nav li a.home,
+#nav li a.new,
+#nav li a.tickets,
+#nav li a.status,
+#nav li a.kb{
+  display:inline-block;
+  height:auto;
+  line-height:1;
+  text-align:center;
+  /* sem ícones-bitmap (padding-left 36px do core): rótulo puro e denso */
+  padding:14px 18px;
+  margin:0;
+  color:#e9ebe8;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.01em;
+  border-radius:0;
+  background-image:none;      /* remove os PNGs de ícone do core */
+  background-color:transparent;
+  border-bottom:3px solid transparent;
+  transition:color .12s ease,background-color .12s ease,border-color .12s ease;
+}
+#nav li a:hover{
+  background-color:rgba(255,255,255,.06);
+  color:#fff;
+  border-bottom-color:var(--zk-green);
+}
+#nav li a.active{
+  background-color:var(--zk-green);
+  color:#fff;
+  border-bottom-color:var(--zk-green-dk);
+}
+
+/* ===================== CONTEÚDO ===================== */
+/* Corpo alinhado à ESQUERDA numa coluna ~680px, com o MESMO recuo
+   lateral do header/nav (o texto começa na mesma vertical do logo). */
+#content{
+  padding:34px var(--zk-pad) 48px;
+  margin:0;
+  max-width:none;
+  min-height:340px;
+  height:auto !important;
+  box-sizing:border-box;
+  background:#fff;
+}
+#content > *{ max-width:var(--zk-form); }
+/* listagens/thread podem usar largura total do conteúdo */
+#content #ticketTable,
+#content #ticketInfo,
+#content .custom-data,
+#content .zk-panel,
+#content .zk-ti-card,
+#content .thread-entry,
+#content #ticketThread,
+#content #landing_page{ max-width:none; }
+
+/* =====================================================================
+   VISUALIZAÇÃO DO CHAMADO (.zk-ti) — cabeçalho + cartões de informações.
+   O markup em include/client/view.inc.php (bloco ZK-TICKETINFO) trocou as
+   tabelas .infoTable/.custom-data do core por estes cartões.
+   ===================================================================== */
+#ticketInfo{ width:100%; }
+.zk-ti-head{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:12px; flex-wrap:wrap; margin:0 0 16px;
+}
+.zk-ti-head h1{
+  margin:0; flex:1 1 auto; min-width:0;
+  /* anula o pontilhado do tema core (#ticketInfo h1) */
+  border-bottom:0; padding-bottom:0;
+}
+.zk-ti-head h1 small{ color:#9aa0a6; font-size:14px; font-weight:600; }
+.zk-ti-head h1 .icon-refresh{ font-size:15px; }
+.zk-ti-head .action-button{ flex:0 0 auto; margin:4px 0 0; }
+.zk-ti-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.zk-ti-card{
+  background:#fff; border:1px solid #e3e6e2; border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05); overflow:hidden;
+}
+.zk-ti-card-title{
+  display:flex; align-items:center; gap:8px; padding:10px 14px;
+  background:#f5f7f4; border-bottom:1px solid #e3e6e2;
+  border-left:3px solid var(--zk-green);
+  color:var(--zk-graphite); font-size:13.5px; font-weight:600;
+}
+.zk-ti-card-title i{ color:var(--zk-green); }
+.zk-ti-rows{ padding:4px 16px; }
+.zk-ti-row{
+  display:flex; align-items:baseline; gap:12px; padding:9px 0;
+  border-bottom:1px solid #f0f2ef;
+}
+.zk-ti-row:last-child{ border-bottom:0; }
+.zk-ti-label{
+  flex:0 0 150px; color:#8a8f8a; font-size:12px; font-weight:600;
+  white-space:nowrap; /* "Status do Chamado" não quebra mais em 2 linhas */
+}
+.zk-ti-value{ color:var(--zk-graphite); min-width:0; word-break:break-word; }
+.zk-ti-value a{ color:var(--zk-green-dk); font-weight:600; text-decoration:none; }
+.zk-ti-value a:hover{ text-decoration:underline; }
+.zk-ti-status{
+  display:inline-block; color:#fff; border-radius:20px; padding:3px 12px;
+  font-size:11.5px; font-weight:600; line-height:1.4; white-space:nowrap;
+}
+.zk-ti-status-hint{
+  display:inline-block; margin-left:8px;
+  font-size:12px; color:#8a8f8a; font-style:italic;
+}
+/* Coluna "Progresso" na listagem de Chamados — % ponderado dos
+   equipamentos (barra + rótulo). */
+.zk-lp{ display:flex; align-items:center; gap:8px; }
+.zk-lp-bar{
+  flex:1 1 auto; height:8px; min-width:50px;
+  background:#eceee9; border-radius:6px; overflow:hidden;
+}
+.zk-lp-bar > span{
+  display:block; height:100%; border-radius:6px;
+  background:linear-gradient(90deg, var(--zk-green-dk), var(--zk-green));
+}
+.zk-lp-pct{ font-size:12px; font-weight:600; color:var(--zk-green-dk); flex:0 0 auto; min-width:34px; text-align:right; }
+.zk-ti-extra{ margin-top:14px; }
+/* Corpo livre de cartão (thread de mensagens, formulário de resposta) */
+.zk-ti-card-body{ padding:14px 16px; }
+.zk-ti-thread{ margin-top:14px; }
+.zk-ti-thread .zk-ti-card-body{ padding-bottom:4px; }
+.zk-ti-reply .zk-ti-card-body h2{ display:none; } /* título já está no cartão */
+
+/* Painéis do cliente viram cartão também (mesma cara dos .zk-ti-card):
+   Equipamentos (.zk-client) e a lista de Chamados (.zk-tickets). Escopado
+   pra NÃO afetar o painel do agente (SCP tem tema próprio e não carrega
+   este arquivo, mas garante). */
+.zk-panel.zk-client,
+.zk-panel.zk-tickets{
+  background:#fff; border:1px solid #e3e6e2; border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05); overflow:hidden; margin:14px 0;
+}
+.zk-panel.zk-client .zk-panel-head,
+.zk-panel.zk-tickets .zk-panel-head{
+  padding:10px 14px; background:#f5f7f4; border-bottom:1px solid #e3e6e2;
+  border-left:3px solid var(--zk-green);
+}
+.zk-panel.zk-client .zk-panel-title,
+.zk-panel.zk-tickets .zk-panel-title{
+  border-left:0; padding-left:0; font-size:13.5px;
+}
+.zk-panel.zk-client .zk-panel-title i,
+.zk-panel.zk-tickets .zk-panel-title i{ color:var(--zk-green); margin-right:4px; }
+/* conteúdo do painel ganha o mesmo respiro lateral dos outros cartões */
+.zk-panel.zk-client > .zk-nf-bar,
+.zk-panel.zk-client > .zk-nf-errors-box,
+.zk-panel.zk-client > .zk-envio-bar,
+.zk-panel.zk-client > .zk-progress-wrap,
+.zk-panel.zk-client > .zk-toolbar,
+.zk-panel.zk-client > .zk-table-wrap{ margin-left:16px; margin-right:16px; }
+.zk-panel.zk-client > .zk-envio-bar{ margin-top:10px; }
+.zk-panel.zk-client > .zk-nf-errors-box{ margin-top:10px; }
+.zk-panel.zk-client > .zk-table-wrap{ margin-bottom:16px; }
+/* Barra da Nota Fiscal — irmã da barra "Envio do produto" (mesma cara),
+   substitui o link solto que ficava no cabeçalho do cartão */
+.zk-panel.zk-client > .zk-nf-bar{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  margin-top:12px; padding:8px 12px;
+  border:1px solid #e3e6e2; border-radius:6px; background:#fafcf8;
+  font-size:12.5px;
+}
+.zk-panel.zk-client > .zk-nf-bar .zk-nf-link{
+  color:var(--zk-green-dk); font-weight:600; text-decoration:none;
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.zk-panel.zk-client > .zk-nf-bar .zk-nf-link:hover{ text-decoration:underline; }
+.zk-panel.zk-client > .zk-nf-bar .zk-nf-link i{ margin-right:2px; }
+/* Lista de Chamados em cartão: respiro interno pro conteúdo */
+.zk-panel.zk-tickets > .zk-toolbar{ margin:12px 16px 10px; }
+.zk-panel.zk-tickets > .zk-table-wrap{ margin:0 16px 12px; }
+.zk-panel.zk-tickets > .zk-pagination{ margin:0 16px 14px; color:#8a8f8a; font-size:12.5px; }
+.zk-panel.zk-tickets #ticketTable caption{ padding:6px 0 8px; }
+/* Número do chamado com ícone FA (no lugar do PNG por origem do core) */
+.zk-ticket-num{ color:var(--zk-graphite); font-weight:600; white-space:nowrap; }
+.zk-ticket-num i{ color:var(--zk-green); margin-right:3px; }
+.zk-ticket-num:hover{ color:var(--zk-green-dk); }
+/* Aproveitar toda a largura da tela: tabela em layout fixo e a coluna
+   Assunto fica com TODO o espaço restante. O módulo (zk_equip_styles)
+   corta .zk-issue-line em 420px fixos — aqui vira fluido: o "…" só
+   aparece quando o texto realmente não couber na janela atual
+   (seletor mais específico pra vencer o CSS embutido do módulo). */
+.zk-panel.zk-tickets #ticketTable{ table-layout:fixed; width:100%; }
+.zk-panel.zk-tickets #ticketTable th:first-child{ width:150px; }
+.zk-panel.zk-tickets #ticketTable .zk-issue-line{ max-width:none; }
+/* Departamento mais enxuto e Pendência larga o bastante pro badge mais
+   comprido ("Envio do produto não informado") não estourar a página —
+   o Assunto (coluna fluida) encolhe pra compensar. Badge pode quebrar
+   em 2 linhas se ainda assim faltar espaço (tela estreita). */
+.zk-panel.zk-tickets #ticketTable th:nth-child(5){ width:120px; }
+.zk-panel.zk-tickets #ticketTable th:nth-child(6){ width:230px; }
+.zk-panel.zk-tickets #ticketTable td .zk-badge-pend{ white-space:normal; line-height:1.35; }
+/* Sub-linha de equipamentos sob o Assunto ("N equipamentos · X concluídos") */
+.zk-panel.zk-tickets .zk-sub i{ margin-right:3px; }
+.zk-equip-done{ color:var(--zk-green-dk); font-weight:600; }
+.zk-table-wrap{
+  width:100%;
+}
+/* Lista de chamados (#ticketTable): o core usa azul/cinza herdados (ver
+   regras originais perto da linha 800) com seletor por ID — precisa
+   neutralizar aqui (mesmo ID, carregado depois) para a paleta ZKTeco
+   "vencer" sem depender de !important. */
+#ticketTable{ border:0; background:transparent; }
+#ticketTable caption{
+  padding:0 0 8px; text-align:left; color:#9aa0a6; background:transparent;
+  border:0; font-weight:400; font-size:12px;
+}
+#ticketTable th{
+  height:auto; line-height:1.4; background:#f5f7f4; color:#474B4F;
+  border:0; border-bottom:1px solid #e3e6e2; padding:8px 10px; font-size:12px; font-weight:600;
+}
+#ticketTable th a{ color:#474B4F; }
+#ticketTable th a:hover{ color:#649E37; }
+#ticketTable td{ padding:8px 10px; border:0; border-bottom:1px solid #f0f2ef; background:transparent; }
+#ticketTable tr.alt td{ background:transparent; }
+#ticketTable tbody tr:hover td{ background:#fafcf8; }
+#ticketTable tbody tr.zk-row-link{ cursor:pointer; }
+#ticketTable tbody a.Icon{ color:#474B4F; font-weight:600; }
+#ticketTable tbody a.Icon:hover{ color:#649E37; }
+.thread-entry{
+  /* width:auto (não 100%!) é de propósito: o core desloca o balão com
+     avatar via margin-left:60px/margin-right:60px (".avatar"/".response")
+     para abrir espaço pro avatar "pendurado" ao lado (margin negativa no
+     avatar). Forçar width:100% ignora essa margem e faz o balão estourar
+     a largura do container em +60px — era exatamente o "vazamento" à
+     direita que aparecia no card do ticket. */
+  width:auto !important;
+  max-width:none !important;
+  box-sizing:border-box;
+}
+.thread-entry .thread-body{
+  width:auto !important;
+}
+
+#content h1{
+  color:var(--zk-graphite);
+  font-size:22px;
+  font-weight:600;
+  margin:0 0 6px;
+  padding-left:12px;
+  border-left:3px solid var(--zk-green);   /* filete de marca no título */
+}
+#content > p{ color:var(--zk-text); margin:0 0 18px; line-height:1.5; }
+
+/* Alertas/avisos coesos com a paleta. */
+#msg_notice,#msg_warning,#msg_error,#msg_info{
+  max-width:var(--zk-form);
+  border-radius:6px;
+  height:auto;
+  line-height:1.4;
+  padding:10px 12px 10px 36px;
+}
+#msg_notice{ border:1px solid var(--zk-green-dk); background:#eef7e6 url('../images/icons/ok.png') 10px 50% no-repeat; }
+#msg_error{ border:1px solid #c0392b; background:#fdecea url('../images/icons/error.png') 10px 50% no-repeat; }
+#msg_warning{ border:1px solid #e08a1e; background:#fff7e6 url('../images/icons/alert.png') 10px 50% no-repeat; }
+
+/* =====================================================================
+   FORMULÁRIO "ABRIR NOVO CHAMADO"  (#ticketForm)
+   Resolve: (1) vão horizontal das linhas read-only; (2) inconsistência
+   entre linhas de 2 colunas e campos colspan=2. Estratégia: NEUTRALIZAR
+   a lógica de 2 colunas da tabela — tudo empilha full-width — e mostrar
+   Email/Solicitante como uma "definição" (dl/dt/dd) em Grid alinhado.
+   ===================================================================== */
+#ticketForm{
+  max-width:var(--zk-form);
+  margin:0;
+}
+
+/* Anula o table-layout:fixed + colunas 160/170px do core. Regra dupla
+   (filho direto E dentro de .zk-account-col) porque a tela de registro de
+   conta usa 2 colunas lado a lado — a tabela não é mais filha direta do
+   form nesse caso. */
+#ticketForm > table,
+#ticketForm .zk-account-col table{
+  width:100% !important;
+  table-layout:auto !important;
+  border-collapse:collapse;
+  border-spacing:0;
+}
+#ticketForm > table td,
+#ticketForm > table td:first-child,
+#ticketForm > table td + td,
+#ticketForm .zk-account-col table td{
+  width:auto !important;   /* mata a coluna de rótulo que criava o vão */
+  height:auto !important;  /* vence a regra antiga "table.padded td{height:20px}"
+                               do core, que cortava campos com label+input juntos
+                               (ex.: formulário de registro de conta) */
+  display:block;           /* cada td vira uma faixa full-width empilhada */
+  padding:7px 0;
+  font-size:14px;
+  vertical-align:top;
+}
+#ticketForm > table tr,
+#ticketForm > table tbody,
+#ticketForm .zk-account-col table tr,
+#ticketForm .zk-account-col table tbody{ display:block; }
+
+/* Divisórias finas entre seções (o osTicket usa <hr> dentro de td). */
+#ticketForm hr{
+  border:0;
+  border-top:1px solid var(--zk-line);
+  margin:16px 0 12px;
+}
+/* Editor de texto (redactor) mais compacto — enxuga a altura do form. */
+#ticketForm .redactor-editor,
+#ticketForm .redactor-box textarea{ min-height:130px; }
+/* Primeira <hr> (topo do bloco read-only) fica oculta: a ficha já traz
+   seu próprio contorno. Companion pro caso de 2 colunas (.zk-account-col)
+   — senão só a coluna esquerda ("Informações de Contato", que tem esse hr
+   gerado automaticamente pelo render do formulário) ficava mais baixa que
+   a direita, desalinhando os dois cabeçalhos de seção. */
+#ticketForm > table tbody:first-child hr,
+#ticketForm .zk-account-col table tbody:first-child hr{ display:none; margin:0; }
+
+/* Registro de conta: "Informações de Contato" e "Senha de acesso" lado a
+   lado — melhor uso do espaço horizontal e menos rolagem. Em telas
+   estreitas, empilha normalmente (flex-wrap). */
+#ticketForm .zk-account-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 40px;
+  align-items:flex-start;
+}
+#ticketForm .zk-account-col{
+  flex:1 1 300px;
+  min-width:280px;
+}
+
+/* Títulos de seção em CAIXA ALTA discreta ("Tópico de Ajuda", etc.). */
+#ticketForm .form-header{ margin:0 0 8px; }
+#ticketForm .form-header b,
+#ticketForm .form-header h3{
+  color:var(--zk-graphite);
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin:0;
+}
+#ticketForm .form-header div{ /* instruções do form dinâmico */
+  text-transform:none;
+  font-weight:400;
+  font-size:13px;
+  color:#7a7f7a;
+  margin-top:4px;
+  letter-spacing:0;
+}
+
+/* ------- Ficha "definição" do cliente (Solicitante/Email) -------
+   Renderizada pelo PHP como .zk-client-meta com pares dt/dd.
+   Grid: rótulo estreito (max-content) + valor (1fr), gap fixo.
+   RESOLVE o vão horizontal: nada de 170px, apenas o necessário. */
+#ticketForm .zk-client-meta{
+  display:grid;
+  grid-template-columns:max-content 1fr;
+  gap:8px 16px;                 /* linha 8px | coluna 16px fixo */
+  align-items:baseline;
+  margin:2px 0 4px;
+  padding:14px 16px;
+  background:var(--zk-bg-soft);
+  border:1px solid var(--zk-line);
+  border-left:3px solid var(--zk-green);
+  border-radius:6px;
+}
+#ticketForm .zk-client-meta dt{
+  margin:0;
+  color:var(--zk-graphite);
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  white-space:nowrap;
+}
+#ticketForm .zk-client-meta dd{
+  margin:0;
+  color:var(--zk-text);
+  font-size:14px;
+  word-break:break-word;
+}
+
+/* ------- Campos: rótulo em cima, controle embaixo, ritmo vertical. --- */
+#ticketForm label{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  color:var(--zk-graphite);
+  margin-bottom:5px;
+  line-height:1.4;
+}
+#ticketForm label em{ font-weight:400; color:#8a8f8a; }
+
+/* Controles compactos com respiro (padding 9px) e foco verde. */
+#ticketForm select,
+#ticketForm input[type=text],
+#ticketForm input[type=email],
+#ticketForm input[type=tel],
+#ticketForm input[type=url],
+#ticketForm input[type=number],
+#ticketForm input[type=password],
+#ticketForm input[type=date],
+#ticketForm textarea{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  padding:9px 11px;
+  border:1px solid #c9cdc7;
+  border-radius:6px;
+  background:#fff;
+  font-size:14px;
+  color:var(--zk-text);
+  display:block;
+  float:none;                 /* anula float:left do core */
+  transition:border-color .12s ease,box-shadow .12s ease;
+}
+#ticketForm textarea{
+  width:100% !important;      /* vence o #ticketForm td textarea{width:600px} do core */
+  min-height:150px;
+  resize:vertical;
+  line-height:1.5;
+}
+#ticketForm select:focus,
+#ticketForm input:focus,
+#ticketForm textarea:focus{
+  border-color:var(--zk-green);
+  outline:none;
+  box-shadow:0 0 0 3px rgba(122,193,67,.18);
+}
+/* <select> do tópico ocupa a coluna toda (era o ponto do "vão" antigo). */
+#ticketForm select#topicId{ width:100%; max-width:100%; }
+/* select2 (quando embrulha o campo) também ocupa a coluna toda. */
+#ticketForm .select2-container{ width:100% !important; }
+
+/* asterisco de obrigatório e erros em vermelho sóbrio. */
+#ticketForm .error,
+#ticketForm font.error{ color:#c0392b; font-weight:600; }
+#ticketForm .error input,
+#ticketForm .error select,
+#ticketForm .error textarea{ border-color:#c0392b; }
+
+/* uploads/checkbox voltam a fluir naturalmente */
+#ticketForm input[type=file]{ border:0; padding:6px 0; }
+#ticketForm input[type=checkbox],
+#ticketForm input[type=radio]{ width:auto; display:inline-block; margin-right:6px; }
+#ticketForm label.inline{ display:inline-block; font-weight:400; margin:0 10px 0 0; }
+
+/* ------- Barra de ações: <hr> final + botões, alinhados à esquerda. --
+   Regras compartilhadas com #zkEditForm (edição de equipamentos) e #reply
+   (responder chamado) — nenhum dos dois é o #ticketForm nativo, mas
+   precisam do mesmo padrão de botão. -- */
+#ticketForm > hr,
+#zkEditForm > hr{
+  border:0;
+  border-top:1px solid var(--zk-line);
+  margin:22px 0 16px;
+}
+#ticketForm p.buttons,
+#zkEditForm p.buttons,
+#reply p.buttons{
+  text-align:left !important;   /* vence o inline style="text-align:center" */
+  margin:0;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+#ticketForm input[type=submit],
+#ticketForm input[type=reset],
+#ticketForm input[type=button],
+#zkEditForm input[type=submit],
+#zkEditForm input[type=reset],
+#zkEditForm input[type=button],
+#reply input[type=submit],
+#reply input[type=reset],
+#reply input[type=button]{
+  padding:11px 24px;
+  font-size:14px;
+  font-weight:600;
+  border-radius:6px;
+  border:1px solid transparent;
+  cursor:pointer;
+  margin:0;
+  transition:background-color .12s ease,border-color .12s ease;
+}
+/* Ação primária (herói): Criar Chamado/Salvar/Publicar em verde, maior. */
+#ticketForm input[type=submit],
+#zkEditForm input[type=submit],
+#reply input[type=submit]{
+  background-color:var(--zk-green);
+  color:#fff;
+  padding:12px 30px;
+  box-shadow:0 1px 2px rgba(71,75,79,.15);
+}
+#ticketForm input[type=submit]:hover,
+#zkEditForm input[type=submit]:hover,
+#reply input[type=submit]:hover{ background-color:var(--zk-green-dk); }
+#ticketForm input[type=submit]:active,
+#zkEditForm input[type=submit]:active,
+#reply input[type=submit]:active{ transform:translateY(1px); }
+/* Ações secundárias: contorno grafite discreto. */
+#ticketForm input[type=reset],
+#ticketForm input[type=button],
+#zkEditForm input[type=reset],
+#zkEditForm input[type=button],
+#reply input[type=reset],
+#reply input[type=button]{
+  background-color:#fff;
+  color:var(--zk-graphite);
+  border-color:#c9cdc7;
+}
+#ticketForm input[type=reset]:hover,
+#ticketForm input[type=button]:hover,
+#zkEditForm input[type=reset]:hover,
+#zkEditForm input[type=button]:hover,
+#reply input[type=reset]:hover,
+#reply input[type=button]:hover{
+  background-color:var(--zk-bg-soft);
+  border-color:var(--zk-graphite);
+}
+
+/* Botões de ação no cabeçalho do chamado (ex.: "Editar"). Sem CSS própria
+   no core — herdava link de texto cru, fora do padrão. */
+.action-button{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:8px 16px; font-size:13px; font-weight:600;
+  border-radius:6px; border:1px solid #c9cdc7;
+  background:#fff; color:var(--zk-graphite);
+  text-decoration:none;
+}
+.action-button:hover{
+  background:var(--zk-bg-soft); border-color:var(--zk-graphite);
+  color:var(--zk-graphite); text-decoration:none;
+}
+
+/* CAPTCHA (só visitante) — mantém legível se aparecer. */
+#ticketForm .captchaRow td{ display:block; }
+#ticketForm .captcha{ margin:0 0 8px; }
+#ticketForm #captcha{ width:auto; max-width:160px; display:inline-block; }
+
+/* =====================================================================
+   LOGIN DO CLIENTE (#clientLogin) — mesma linguagem de ficha/TI.
+   ===================================================================== */
+#clientLogin{
+  display:block;
+  max-width:var(--zk-form);
+  margin:18px 0 0;
+  padding:24px;
+  border:1px solid var(--zk-line);
+  border-top:3px solid var(--zk-green);
+  border-radius:8px;
+  box-shadow:none;
+  background:#fff;   /* remove o cadeado/inset cinza do core */
+}
+#clientLogin .login-box{
+  width:auto;
+  display:block;
+  box-shadow:none;
+  padding:0;
+}
+#clientLogin > div[style*="table-row"]{ display:block !important; }
+#clientLogin > div > div[style*="table-cell"]{
+  display:block !important;
+  padding:18px 0 0 !important;
+  margin-top:18px;
+  border-top:1px solid var(--zk-line-soft);
+  font-size:13px;
+}
+#clientLogin strong{ font-size:12px; color:#c0392b; display:block; margin-bottom:6px; }
+#clientLogin input[type=text],
+#clientLogin input[type=password]{
+  width:100%;
+  box-sizing:border-box;
+  padding:10px 12px;
+  border:1px solid #c9cdc7;
+  border-radius:6px;
+  margin:0 0 12px;
+  font-size:14px;
+  background:#fff;
+}
+#clientLogin input[type=text]:focus,
+#clientLogin input[type=password]:focus{
+  border-color:var(--zk-green);
+  outline:none;
+  box-shadow:0 0 0 3px rgba(122,193,67,.18);
+}
+#clientLogin input.btn,
+#clientLogin input[type=submit]{
+  padding:11px 26px;
+  border:0;
+  border-radius:6px;
+  background-color:var(--zk-green);
+  color:#fff;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+#clientLogin input.btn:hover,
+#clientLogin input[type=submit]:hover{ background-color:var(--zk-green-dk); }
+
+/* CTA "Criar minha conta" — antes era um linkzinho de texto perdido ao
+   lado do login; agora é um botão de verdade, do tamanho do "Entrar",
+   para ficar óbvio pra quem ainda não tem conta o que fazer. */
+.zk-create-account-box{ text-align:center; }
+.zk-create-account-hint{
+  margin:0 0 8px;
+  font-size:13px;
+  color:var(--zk-graphite);
+}
+.zk-create-account-btn{
+  display:block;
+  padding:12px 20px;
+  border-radius:6px;
+  background-color:var(--zk-graphite);
+  color:#fff;
+  font-size:14px;
+  font-weight:600;
+  text-align:center;
+  text-decoration:none;
+}
+.zk-create-account-btn:hover{
+  background-color:#3a3d40;
+  border-bottom:0;
+  color:#fff;
+}
+
+/* Login e "Verificar Status do Ticket" — cartão pequeno e centralizado,
+   estilo Gmail/WordPress. Só estas 2 páginas renderizam #clientLogin
+   (login.inc.php e accesslink.inc.php), então :has() escopa a mudança
+   sem precisar tocar em nenhum arquivo PHP do core. */
+#content:has(#clientLogin) > h1,
+#content:has(#clientLogin) > p{
+  text-align:center;
+  max-width:380px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#clientLogin{
+  max-width:380px;
+  margin:18px auto 0;
+}
+
+/* =====================================================================
+   LOGIN — SPLIT HERO (.zk-login): tela de apresentação do portal.
+   Painel de marca à esquerda (gradiente grafite→verde + anéis/pontos
+   ecoando biometria, proposta de valor com ícones) e cartão de login
+   elevado à direita. Markup em include/client/login.inc.php.
+   O bloco antigo #clientLogin (acima) fica: ainda estiliza a página
+   "Verificar Status" (accesslink.inc.php).
+   ===================================================================== */
+/* Cadeia de flex completa até o rodapé: body já estica o #container
+   (flex:1); aqui o #container passa a esticar o #content, e o #content
+   estica o .zk-login — hero e cartão preenchem toda a altura útil. */
+#container:has(.zk-login){ display:flex; flex-direction:column; }
+#container:has(.zk-login) > #header{ flex:0 0 auto; }
+#container:has(.zk-login) > #content{ flex:1 1 auto; }
+#content:has(.zk-login){
+  padding:0;                       /* hero ocupa a faixa inteira */
+  display:flex; flex-direction:column;
+}
+#content:has(.zk-login) > .zk-login{ flex:1 1 auto; } /* estica até o rodapé */
+#content:has(.zk-login) > #msg_error,
+#content:has(.zk-login) > #msg_notice,
+#content:has(.zk-login) > #msg_warning{ margin:16px var(--zk-pad); flex:0 0 auto; }
+.zk-login{
+  display:grid;
+  grid-template-columns:1.15fr 1fr;
+  min-height:max(540px, calc(100vh - 250px));
+}
+
+/* ---- Painel de marca (esquerda) ---- */
+.zk-login-hero{
+  position:relative; overflow:hidden;
+  background:
+    radial-gradient(ellipse at 85% 115%, rgba(122,193,67,.40), transparent 55%),
+    radial-gradient(ellipse at -10% -20%, rgba(122,193,67,.14), transparent 50%),
+    linear-gradient(140deg, #43474b 0%, var(--zk-graphite) 55%, #3c5527 145%);
+}
+.zk-login-hero::before{ /* anéis concêntricos — eco de digital/biometria */
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:repeating-radial-gradient(circle at 88% 10%,
+    transparent 0 26px, rgba(255,255,255,.05) 26px 28px);
+}
+.zk-login-hero::after{ /* grade de pontos, esvaindo pra direita */
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.08) 1px, transparent 1.6px);
+  background-size:26px 26px;
+  -webkit-mask-image:linear-gradient(115deg, rgba(0,0,0,.55), transparent 62%);
+  mask-image:linear-gradient(115deg, rgba(0,0,0,.55), transparent 62%);
+}
+.zk-login-hero-inner{
+  position:relative; z-index:1; height:100%; box-sizing:border-box;
+  /* Ancorado no TOPO com recuo fixo (não centralizado): a posição do
+     texto fica IGUAL em todas as telas que usam o hero (login, registro),
+     independente da altura do cartão ao lado — centralizar fazia o texto
+     "pular" ao navegar entre telas. O recuo escala só com a viewport. */
+  display:flex; flex-direction:column; justify-content:flex-start; gap:20px;
+  padding:clamp(32px,5vw,74px); padding-top:clamp(44px, 9vh, 110px);
+  max-width:640px;
+}
+.zk-login-kicker{
+  display:inline-flex; align-items:center; gap:10px;
+  font-size:11.5px; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:rgba(255,255,255,.72);
+}
+.zk-login-kicker::before{ content:""; width:26px; height:2px; background:var(--zk-green); }
+.zk-login-hero h2{
+  margin:0; font-size:clamp(26px,3vw,38px); line-height:1.16;
+  font-weight:700; letter-spacing:-.5px; color:#fff;
+}
+.zk-login-hero h2 em{ font-style:normal; color:var(--zk-green); }
+.zk-login-hero-sub{
+  margin:0; font-size:30pt; line-height:1.6; color:rgba(255,255,255,.78);
+}
+.zk-login-hero-sub h2{
+  margin:0; font-size:inherit; line-height:inherit; color:inherit;
+  font-family:var(--zk-font-display); font-weight:600;
+}
+.zk-login-feats{ list-style:none; margin:8px 0 0; padding:0;
+  display:flex; flex-direction:column; gap:13px; }
+.zk-login-feats li{ display:flex; align-items:flex-start; gap:12px;
+  font-size:13.5px; line-height:1.45; color:rgba(255,255,255,.93); }
+.zk-login-feats i{
+  flex:0 0 auto; width:34px; height:34px; margin-top:-2px;
+  display:inline-flex; align-items:center; justify-content:center;
+  border-radius:9px; font-size:14px; color:var(--zk-green);
+  background:rgba(122,193,67,.16); border:1px solid rgba(122,193,67,.35);
+}
+.zk-login-trust{
+  /* ZK: empurrado pro rodapé do painel de marca (2026-08-20) — antes vinha
+     colado embaixo da lista de recursos, com espaço vazio grande entre ele
+     e o fim do painel. margin-top:auto usa o espaço livre do flex column
+     de .zk-login-hero-inner pra ancorar este aviso no rodapé. */
+  margin:auto 0 0; padding-top:16px;
+  border-top:1px solid rgba(255,255,255,.13);
+  display:flex; align-items:center; gap:8px;
+  font-size:12px; color:rgba(255,255,255,.55);
+}
+
+/* ---- Cartão de login (direita) ---- */
+.zk-login-side{
+  display:flex; align-items:center; justify-content:center;
+  box-sizing:border-box; padding:clamp(26px,4vw,56px);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(122,193,67,.09), transparent 55%),
+    #fff;
+}
+.zk-login-card{
+  width:100%; max-width:410px; box-sizing:border-box;
+  background:#fff; border:1px solid var(--zk-line); border-radius:16px;
+  box-shadow:0 24px 60px -18px rgba(45,66,32,.25), 0 4px 14px rgba(0,0,0,.05);
+  padding:36px 36px 30px;
+}
+#content .zk-login-card h1{
+  margin:0 0 6px; padding:0; border:0; text-align:center;
+  font-size:24px; color:var(--zk-graphite);
+}
+.zk-login-card-sub{ margin:0 0 22px; font-size:13.5px; line-height:1.55; color:#7b817c; text-align:center; }
+.zk-login-err{
+  display:block; margin:0 0 14px; padding:9px 12px;
+  background:#fdecea; border:1px solid #f0c9c9; border-radius:8px;
+  color:#a5281b; font-size:12.5px; font-weight:600;
+}
+.zk-login-field{ position:relative; margin:0 0 14px; }
+.zk-login-field > i{
+  position:absolute; left:13px; top:50%; transform:translateY(-50%);
+  color:#9aa59b; font-size:14px; pointer-events:none;
+}
+.zk-login-field input{
+  width:100%; box-sizing:border-box;
+  padding:12px 14px 12px 38px;
+  border:1px solid #cfd5cc; border-radius:10px;
+  font-size:14px; background:#fff;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.zk-login-field input:focus{
+  border-color:var(--zk-green); outline:none;
+  box-shadow:0 0 0 4px rgba(122,193,67,.16);
+}
+.zk-login-card input:-webkit-autofill{
+  -webkit-box-shadow:0 0 0 40px #fff inset;
+}
+.zk-login-submit{
+  width:100%; box-sizing:border-box; margin-top:2px;
+  padding:13px; border:0; border-radius:10px;
+  background:linear-gradient(180deg, #83cb4d, #6fb43a);
+  color:#fff; font-size:14.5px; font-weight:700; cursor:pointer;
+  box-shadow:0 6px 16px rgba(122,193,67,.35);
+  transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+.zk-login-submit:hover{
+  filter:brightness(.97); transform:translateY(-1px);
+  box-shadow:0 9px 20px rgba(122,193,67,.42);
+}
+.zk-login-submit:active{ transform:translateY(0); box-shadow:0 4px 10px rgba(122,193,67,.3); }
+.zk-login-forgot{
+  display:block; margin-top:14px; text-align:center;
+  font-size:12.5px; color:var(--zk-green-dk); text-decoration:none;
+}
+.zk-login-forgot:hover{ text-decoration:underline; }
+.zk-login-divider{
+  display:flex; align-items:center; gap:12px;
+  margin:20px 0 14px; color:#9aa59b; font-size:12px;
+}
+.zk-login-divider::before,
+.zk-login-divider::after{ content:""; flex:1; height:1px; background:var(--zk-line); }
+.zk-login .zk-create-account-btn{
+  display:block; box-sizing:border-box; text-align:center;
+  padding:12px; border-radius:10px;
+  border:1.5px solid #cfd5cc; background:#fff; color:var(--zk-graphite);
+  font-size:14px; font-weight:700; text-decoration:none;
+  transition:background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.zk-login .zk-create-account-btn:hover{
+  border-color:var(--zk-graphite); background:var(--zk-graphite); color:#fff;
+}
+/* Responsivo: cartão primeiro (quem chega no celular quer entrar),
+   painel de marca vira faixa abaixo com features em 2 colunas. */
+@media (max-width:920px){
+  .zk-login{ grid-template-columns:1fr; min-height:0; }
+  .zk-login-side{ order:-1; padding:34px var(--zk-pad); }
+  .zk-login-hero-inner{ max-width:none; padding:34px var(--zk-pad) 44px; }
+  .zk-login-feats{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+}
+@media (max-width:560px){
+  .zk-login-feats{ grid-template-columns:1fr; }
+  .zk-login-card{ padding:28px 22px 24px; }
+}
+
+/* ---- Registro de conta (.zk-signup): mesmo hero, cartão mais largo ---- */
+.zk-signup .zk-login-card{ max-width:560px; }
+/* o POLIMENTO v2 transforma #ticketForm em cartão — aqui ele já está
+   DENTRO do cartão do hero; neutraliza pra não virar cartão duplo */
+.zk-signup #ticketForm{
+  background:transparent; border:0; border-radius:0;
+  box-shadow:none; padding:0;
+}
+/* passos numerados no painel de marca (1-2-3, chips como os do login) */
+.zk-signup-steps i{ font-style:normal; font-weight:700; font-size:14px; }
+.zk-signup #ticketForm hr{ border:0; border-top:1px solid var(--zk-line); margin:18px 0 14px; }
+
+/* =====================================================================
+   LANDING (index.php) — botões e sidebar na paleta ZKTeco, sem quebrar
+   o layout de duas colunas do core.
+   ===================================================================== */
+#landing_page .blue.button,
+#landing_page .blue.button:visited,
+.blue.button,.blue.button:visited{
+  background-color:var(--zk-green);
+  box-shadow:none;
+  text-shadow:none;
+  border-radius:var(--zk-radius);
+}
+#landing_page .blue.button:hover,.blue.button:hover{ background-color:var(--zk-green-dk); }
+#landing_page .green.button,
+#landing_page .green.button:visited,
+.green.button,.green.button:visited{
+  background-color:var(--zk-graphite);
+  box-shadow:none;
+  text-shadow:none;
+  border-radius:var(--zk-radius);
+}
+#landing_page .green.button:hover,.green.button:hover{ background-color:#3a3d40; }
+.sidebar .content{
+  padding:14px;
+  border:1px solid var(--zk-line);
+  background:var(--zk-bg-soft);
+  border-radius:var(--zk-radius);
+}
+.main-content .thread-body{ line-height:1.55; }
+.search-form .search,.searchbar .search{
+  border:1px solid #c9cdc7; border-radius:6px;
+}
+.search-form .search:focus,.searchbar .search:focus{
+  border-color:var(--zk-green); outline:none;
+  box-shadow:0 0 0 3px rgba(122,193,67,.18);
+}
+.featured-category i{ color:rgba(122,193,67,.85); }
+
+/* =====================================================================
+   RODAPÉ — mesma faixa/recuo, borda contínua com o corpo.
+   ===================================================================== */
+#footer{
+  text-align:left;
+  font-size:11.5px;
+  color:var(--zk-graphite);
+  padding:18px var(--zk-pad);
+  border-top:1px solid var(--zk-line);
+  background:var(--zk-bg-soft);
+  margin-top:0;
+  width:calc(100% - 32px);
+  max-width:var(--zk-col);
+  margin-left:auto;
+  margin-right:auto;
+  box-sizing:border-box;
+  border-left:1px solid var(--zk-line);
+  border-right:1px solid var(--zk-line);
+}
+#footer p{ margin:0; }
+#footer a{ color:var(--zk-graphite); font-weight:600; }
+#footer #poweredBy{ display:none; }  /* uso interno: oculta "powered by" */
+
+/* =====================================================================
+   POP-UP "Por favor, aguarde!" (#loading) — o core usa azul/laranja
+   genéricos; troca pra paleta ZKTeco. O <p> ("vai levar um segundo!")
+   foi removido do footer.inc.php, então a caixa encolhe pro título:
+   o core fixa height:100px — aqui vira auto, com o título centralizado
+   na vertical ao lado do spinner (background do próprio #loading).
+   ===================================================================== */
+#loading{
+  border:1px solid var(--zk-green);
+  border-radius:8px;
+  box-shadow:0 6px 24px rgba(0,0,0,.12);
+  height:auto;
+  padding:26px 20px 26px 60px;
+}
+#loading h4{ color:var(--zk-green-dk); margin:0; }
+
+/* =====================================================================
+   RESPONSIVO (<=768px): coluna fluida, campos e nav confortáveis.
+   ===================================================================== */
+@media (max-width:768px){
+  #container,#footer{ border-left:0; border-right:0; max-width:100%; width:100%; }
+  #header{ height:auto; padding:12px var(--zk-pad); }
+  #header p{ padding-top:8px; max-width:none; }
+  #header #logo img{ max-height:44px; }
+  #nav{ padding:0 8px; }
+  #nav li a{ padding:12px 12px; font-size:12.5px; }
+  #content{ padding:22px var(--zk-pad) 36px; }
+  #content > *,#ticketForm,#clientLogin,#msg_notice,#msg_error,#msg_warning{ max-width:100%; }
+  .zk-ti-grid{ grid-template-columns:1fr; }
+  .zk-ti-label{ flex-basis:120px; white-space:normal; }
+  .zk-table-wrap{ overflow-x:auto; }
+  .zk-table{ min-width:760px; }
+  #ticketForm .zk-client-meta{ grid-template-columns:1fr; gap:2px 0; }
+  #ticketForm .zk-client-meta dt{ margin-top:8px; }
+  #ticketForm .zk-client-meta dt:first-child{ margin-top:0; }
+  #ticketForm p.buttons input{ flex:1 1 auto; text-align:center; }
+  /* ZK: sidebar (FAQ/KB) e colunas .span4/.span8 empilham em vez de
+     cortar/espremer — sem isso ficavam com largura fixa (215px/29.5%)
+     e float, sem nunca voltar a display:block em telas estreitas. */
+  .sidebar{ float:none; width:auto; margin-left:0; margin-right:0; }
+  .rtl .sidebar{ margin-right:0; }
+  .span4,.span8{ display:block; width:auto; margin:0 0 15px; }
+  /* ZK: "Consultar status do chamado" — login-box/instructions usavam
+     display:table-cell dentro de display:table-row e nunca empilhavam,
+     só espremiam o formulário/instruções numa faixa estreita ilegível. */
+  #clientLogin [style*="display:table-row"]{ display:block !important; }
+  .login-box{ display:block; width:auto; box-shadow:none; }
+  #clientLogin .instructions{ display:block; padding:15px 0 0; }
+  .rtl #clientLogin .instructions{ padding:15px 0 0; }
+}
+/* =====================================================================
+   POLIMENTO v2 — páginas logadas no mesmo nível da tela de login.
+   Fundo do conteúdo suave (cartões "flutuam"), sombras em camadas,
+   botões verdes com gradiente + elevação (família do botão "Entrar").
+   ===================================================================== */
+/* Fundo do conteúdo: cinza suave + brilho verde discreto no canto.
+   Login fica de fora (o hero já pinta os fundos próprios). */
+#content:not(:has(.zk-login)){
+  background:
+    radial-gradient(circle at 12% -4%, rgba(122,193,67,.07), transparent 42%),
+    var(--zk-bg-soft);
+}
+/* Header com profundidade sutil sobre o conteúdo */
+#header{ position:relative; z-index:5; box-shadow:0 4px 14px rgba(0,0,0,.04); }
+
+/* Cartões: raio maior + sombra em camadas (mesma família do cartão de login) */
+.zk-ti-card,
+.zk-panel.zk-client,
+.zk-panel.zk-tickets{
+  border-radius:12px;
+  border-color:#e8ebe6;
+  box-shadow:0 10px 30px -14px rgba(45,66,32,.16), 0 2px 6px rgba(0,0,0,.04);
+}
+
+/* Formulários de página inteira viram cartão: Abrir Novo Ticket, Perfil
+   e Registro (#ticketForm) + Editar equipamentos (#zkEditForm) */
+#ticketForm,
+#zkEditForm{
+  background:#fff;
+  border:1px solid #e8ebe6;
+  border-radius:12px;
+  box-shadow:0 10px 30px -14px rgba(45,66,32,.16), 0 2px 6px rgba(0,0,0,.04);
+  padding:26px 28px;
+  box-sizing:border-box;
+}
+
+/* Botão verde principal: gradiente + elevação no hover, como o "Entrar" */
+#ticketForm input[type=submit],
+#zkEditForm input[type=submit],
+#reply input[type=submit],
+.button.zk-btn,
+.zk-btn{
+  background:linear-gradient(180deg, #83cb4d, #6fb43a);
+  border:0;
+  box-shadow:0 5px 14px rgba(122,193,67,.30);
+  transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+#ticketForm input[type=submit]:hover,
+#zkEditForm input[type=submit]:hover,
+#reply input[type=submit]:hover,
+.button.zk-btn:hover,
+.zk-btn:hover{
+  background:linear-gradient(180deg, #83cb4d, #6fb43a);
+  filter:brightness(.97);
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(122,193,67,.38);
+}
+#ticketForm input[type=submit]:active,
+#zkEditForm input[type=submit]:active,
+#reply input[type=submit]:active,
+.zk-btn:active{ transform:translateY(0); box-shadow:0 4px 10px rgba(122,193,67,.28); }
+
+/* Barra de progresso do painel de equipamentos: gradiente + brilho */
+.zk-panel.zk-client .zk-progress-bar{ background:#e9ede6; }
+.zk-panel.zk-client .zk-progress-bar > span{
+  background:linear-gradient(90deg, #6fb43a, #8fd35b);
+}
+
+/* =====================================================================
+   THREAD "MENSAGENS" DO CLIENTE — mesmo conceito da tela do agente
+   (timeline de cartões + eventos de sistema ocultos). 2026-07-07.
+   Classes idênticas às do core (.thread-entry/.thread-event); só CSS.
+   Prefixo #content p/ vencer a cascata do core sem depender de ordem.
+   ===================================================================== */
+/* Eventos de sistema ("criado por", "alterou o estado para…") ocultos —
+   redundantes com o selo de status e o painel de equipamentos. */
+#ticketThread .thread-event{ display:none !important; }
+#ticketThread::before{ display:none !important; } /* conector pontilhado */
+
+/* Cada entrada vira cartão branco com faixa de acento lateral. */
+#content .thread-entry{
+  position:relative;
+  background:#fff;
+  border:1px solid #e6e9e4;
+  border-radius:12px;
+  box-shadow:0 1px 2px rgba(71,75,79,.05), 0 8px 20px -14px rgba(71,75,79,.22);
+  margin-bottom:18px;
+  padding:0;
+}
+#content .thread-entry::after{ display:none; }   /* separador branco do core */
+#content .thread-entry::before{                   /* faixa de acento lateral */
+  content:""; display:block; border:0;
+  position:absolute; left:0; top:0; bottom:0; width:4px;
+  border-radius:12px 0 0 12px; background:#cfd5cc;
+}
+#content .thread-entry.response::before{ background:var(--zk-green); } /* equipe  */
+#content .thread-entry.message::before { background:#9fb2c9; }         /* cliente */
+
+/* Cabeçalho achatado (sem barra colorida nem biquinhos do balão). */
+#content .thread-entry .header{
+  background:transparent !important;
+  border:0 !important; border-radius:0 !important;
+  padding:12px 18px 6px 22px !important;
+  font-size:13px; color:#6b7075;
+}
+#content .thread-entry.avatar .header:before,
+#content .thread-entry.avatar .header:after{ display:none !important; }
+#content .thread-entry .header b{ color:var(--zk-graphite); font-weight:700; }
+#content .thread-entry .header time{ color:#9aa0a4; }
+#content .thread-entry .header .title{
+  margin-left:10px; padding:2px 9px; background:#f2f4ef;
+  border-radius:20px; font-size:11.5px; font-weight:600; color:#7a8085;
+}
+
+/* Corpo da mensagem. */
+#content .thread-entry .thread-body{
+  border:0 !important; border-radius:0 !important;
+  padding:2px 18px 16px 22px !important;
+  color:var(--zk-text); line-height:1.6;
+}
+/* Avatares circulares (sem recorte). */
+#content .thread-entry .avatar,
+#content .thread-entry img.avatar{ border-radius:50%; }
+/* Anexos em bloco verde-claro (paleta). */
+#content .thread-body .attachments{
+  background:#f6faf1; border-top:1px dashed #dfe8d3;
+  border-radius:9px; margin:12px 0 0; padding:8px 12px;
+}
+
+/* ===== ZK: coluna "Prazo (SLA)" na listagem de chamados (cliente) ===== */
+.zk-sla{ display:flex; flex-direction:column; gap:4px; font-size:13px; }
+.zk-sla-date{ color:#474B4F; white-space:nowrap; }
+.zk-sla-date i{ color:#8a9a86; margin-right:3px; }
+.zk-sla.zk-sla-late .zk-sla-date{ color:#c0392b; font-weight:600; }
+.zk-sla-tag-late{ display:inline-block; width:fit-content; background:#c0392b; color:#fff; padding:1px 9px; border-radius:10px; font-size:11px; font-weight:700; letter-spacing:.3px; }
+
+/* ===== ZK: botão de histórico recolhido da thread (cliente) ===== */
+.zk-thread-toggle{ display:inline-flex; align-items:center; gap:7px; cursor:pointer; margin:4px 0 16px; padding:8px 15px; border:1px solid var(--zk-border,#d7ddd2); border-radius:9px; background:#f4f7f1; color:var(--zk-green-dk,#4f7f26); font-weight:600; font-size:13px; line-height:1; transition:background .15s; }
+.zk-thread-toggle:hover{ background:#e9f0e1; }
+.zk-thread-toggle i{ font-size:12px; }
+
+/* ===== FIM DA CAMADA ZKTECO ===== */

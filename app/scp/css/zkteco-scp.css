@@ -1,0 +1,1288 @@
+/* =====================================================================
+   SKIN ZKTECO — PAINEL DA EQUIPE (SCP)
+   Camada de identidade visual carregada DEPOIS do login.css/scp.css
+   (ver include/staff/login.header.php e include/staff/header.inc.php).
+   Paleta: verde #7AC143 | verde escuro #649E37 | grafite #474B4F.
+   Mesmo padrão do portal do cliente (theme.css, camada ZKTeco).
+   Documentado em: OneDrive .../Manutenção/V3/CUSTOMIZACOES_OSTICKET.md
+   ===================================================================== */
+
+/* ---- Tokens (espelham os de assets/default/css/theme.css) ----
+   scp.css não tinha :root próprio; este é o primeiro. Mesmos tokens do
+   lado cliente pra manter os dois "mundos visuais" consistentes —
+   inclusive as cores de tag usadas por zk_equip_statuses()
+   (include/zk_equipment.php), já que o painel do agente lê esse array. */
+:root{
+  --zk-green:#7AC143;
+  --zk-green-dk:#649E37;
+  --zk-graphite:#474B4F;
+  --zk-text:#555555;
+  --zk-radius:0px;
+  --zk-tag-gray:var(--zk-graphite);
+  --zk-tag-green:var(--zk-green-dk);
+  --zk-tag-blue:#0043ce;
+  --zk-tag-cyan:#007d79;
+  --zk-tag-purple:#6929c4;
+  --zk-tag-yellow:#8a6d00;
+  --zk-tag-red:#da1e28;
+}
+
+/* Carbon: contorno de foco consistente (mesmo tratamento do lado cliente). */
+:focus-visible{ outline:2px solid var(--zk-green-dk); outline-offset:2px; }
+
+/* ============================ LOGIN ================================ */
+/* Fundo: gradiente grafite→verde com anéis de biometria (mesma
+   linguagem do hero do portal do cliente) — substitui a foto padrão. */
+#loginBody{
+  background:
+    repeating-radial-gradient(circle at 88% 8%,
+      transparent 0 26px, rgba(255,255,255,.045) 26px 28px),
+    radial-gradient(ellipse at 85% 115%, rgba(122,193,67,.40), transparent 55%),
+    linear-gradient(140deg, #43474b 0%, #474B4F 55%, #3c5527 145%);
+  background-attachment: fixed;
+}
+#loginBody #brickwall,
+#loginBody #blur{ display:none; }
+
+/* Cartão de login — branco sólido, elevado (como o cartão do cliente) */
+#loginBody #loginBox{
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 24px 60px -12px rgba(0,0,0,.5);
+  padding:2.2em 2.4em 1.8em;
+  top:12%;
+}
+#loginBody #loginBox:after{ display:none; }
+
+/* Logo ZKTeco (reusa o arquivo do portal do cliente) no lugar do
+   logo padrão do osTicket + subtítulo do painel */
+#loginBody #logo a{
+  background:url(../../assets/default/images/logo.png) center/contain no-repeat;
+  height:78px;
+}
+#loginBody #logo a img{ display:none; }
+#loginBody #logo::after{
+  content:'CENTRAL DE MANUTENÇÃO';
+  display:block;
+  margin:10px 0 2px;
+  font-size:10.5px; font-weight:700; letter-spacing:.18em;
+  color:#8a8f8a;
+}
+#loginBody #login-message{ color:#c0392b; font-weight:600; }
+
+/* Campos e botão na família do portal */
+#loginBody form{ width:270px; }
+#loginBody fieldset input[type=text],
+#loginBody fieldset input[type=password]{
+  padding:11px 14px;
+  font-size:.8em;
+  border:1px solid #cfd5cc;
+  border-radius:10px;
+  background:#fff;
+  margin-bottom:12px;
+}
+#loginBody input:focus{
+  border:1px solid #7AC143;
+  box-shadow:0 0 0 4px rgba(122,193,67,.16);
+  outline:none;
+}
+#loginBody button[type=submit]{
+  display:block; width:100%; float:none;
+  height:auto; padding:12px; margin-top:4px;
+  border:0; border-radius:10px;
+  background:linear-gradient(180deg, #83cb4d, #6fb43a);
+  color:#fff; font-weight:700; font-size:.85em;
+  box-shadow:0 5px 14px rgba(122,193,67,.35);
+  transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+#loginBody button[type=submit]:hover{
+  background:linear-gradient(180deg, #83cb4d, #6fb43a);
+  filter:brightness(.97); transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(122,193,67,.42);
+  color:#fff;
+}
+#loginBody #reset-link{ color:#649E37; font-weight:600; }
+#loginBody #company .content{
+  background:transparent; box-shadow:none; text-shadow:none;
+  color:rgba(255,255,255,.7);
+}
+#loginBody #poweredBy{ display:none; }  /* uso interno, como no portal */
+
+/* ====================== PAINEL LOGADO (APP) ======================== */
+/* Links: azul core -> verde escuro ZKTeco (legível em fundo claro) */
+a{ color:#4c7727; }
+div#header a{ color:#474B4F; }
+
+/* Cabeçalho: branco limpo com filete verde (assinatura da marca) */
+#header{
+  background-color:#fff;
+  box-shadow:none;
+  border-bottom:3px solid #7AC143;
+}
+
+/* Logo ZKTeco também no cabeçalho logado */
+#header #logo{
+  background:url(../../assets/default/images/logo.png) 5px center/contain no-repeat;
+}
+#header #logo img{ display:none; }
+
+/* Navegação principal: barra grafite com aba ativa verde (mesma
+   linguagem do menu do portal do cliente) */
+#nav{
+  background:#474B4F;
+  border-top:1px solid #474B4F;
+  border-bottom:3px solid #7AC143;
+}
+#nav .active, #nav .inactive{
+  border:0;
+  border-radius:6px 6px 0 0;
+}
+#nav li.active, #nav li.inactive:hover{
+  box-shadow:none;
+  border-color:transparent;
+}
+#nav .inactive a{ color:#e2e5e1; }
+#nav li.inactive:hover{ background-color:#5a5f63; }
+#nav li.inactive:hover > a{ color:#fff; }
+#nav li.active{ background-color:#7AC143; }
+#nav .active a{ color:#fff; }
+/* dropdowns do menu continuam claros (texto escuro do core prevalece) */
+#nav li.inactive > ul{ border-radius:0 0 6px 6px; box-shadow:0 8px 22px rgba(0,0,0,.18); }
+
+/* Badge "Início" (2026-08-21) — ao lado de Visão geral/Manutenções, ver
+   navigation.tmpl.php. Círculo pequeno, discreto, sem o padding de aba.
+   INLINE-flex (não "flex"): li sem .active/.inactive não herda o
+   display:inline-block do core (#nav .active,#nav .inactive) — com
+   "flex" (block-level) o item quebrava pra linha própria embaixo da
+   topbar em vez de ficar ao lado das abas. */
+#nav li.zk-nav-home{
+  display:inline-flex; align-items:center; vertical-align:middle;
+  margin-left:2px; width:auto; min-width:0; height:auto;
+}
+#nav li.zk-nav-home > a{
+  display:flex; align-items:center; justify-content:center;
+  width:28px; height:28px; padding:0; border-radius:50%;
+  background:rgba(255,255,255,.08); color:#e2e5e1; font-size:13px;
+}
+#nav li.zk-nav-home > a:hover{ background:#7AC143; color:#fff; }
+
+/* Botões de ação primários: verde ZKTeco */
+button[type=submit], input[type="submit"], .primary.button{
+  background:linear-gradient(180deg, #83cb4d, #6fb43a);
+  color:#fff;
+  box-shadow:0 1px 4px rgba(122,193,67,.4);
+  border-radius:4px;
+}
+button[type=submit]:hover, input[type="submit"]:hover, input[type=submit]:active,
+.primary.button:hover{
+  background:linear-gradient(180deg, #78c043, #649E37);
+  color:#fff;
+  box-shadow:0 2px 6px rgba(100,158,55,.5);
+}
+.green.button{ background-color:#7AC143; }
+.green.button:hover{ background-color:#649E37; }
+
+/* Ordenação das tabelas: azul core -> tom verde-claro */
+table.list thead th a.asc{ background-color:#e0efd0; }
+table.list thead th a.desc{ background-color:#e0efd0; }
+
+/* ===================================================================
+   MODERNIZAÇÃO v2 — SCP no mesmo nível visual do portal do cliente:
+   fundo suave com brilho verde, conteúdo em cartão, tabelas limpas,
+   abas com sublinhado verde, formulários e diálogos da mesma família.
+   =================================================================== */
+
+/* ---- Moldura geral: APP DE LARGURA TOTAL, cartão até o rodapé ---- */
+/* ZK (2026-08-21): barra de rolagem sempre reservada — sem isso, abrir o
+   painel #zk-advfilter (mais alto) faz a página passar a rolar, a
+   scrollbar aparece e "rouba" ~15px de largura útil, encolhendo/
+   reajustando a tabela de chamados (efeito "responsividade quebrando"
+   ao abrir/fechar o filtro). scrollbar-gutter é a forma moderna;
+   overflow-y:scroll é o fallback pra navegadores sem suporte. */
+html{ overflow-y:scroll; scrollbar-gutter:stable; }
+html{ background:#f4f6f2; }
+body{
+  min-height:100vh;
+  display:flex;              /* cadeia de flex: o cartão de conteúdo */
+  flex-direction:column;     /* estica até o rodapé (sem mar de cinza) */
+  background:
+    radial-gradient(circle at 8% -8%, rgba(122,193,67,.10), transparent 38%),
+    radial-gradient(circle at 100% 115%, rgba(122,193,67,.06), transparent 45%),
+    #f4f6f2;
+}
+#container{
+  width:auto;
+  max-width:none;
+  margin:0;
+  padding:0;
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+}
+#container > #pjax-container{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+}
+#container #content, #pjax-container #content{
+  flex:1 1 auto;             /* o cartão cresce e encosta no rodapé */
+}
+#header, #nav, #sub_nav, #content{
+  border-left:0;
+  border-right:0;
+}
+
+/* Cabeçalho: faixa branca de ponta a ponta, itens alinhados por flex
+   (p#info vem antes do logo no DOM — row-reverse põe o logo à esquerda) */
+#header{
+  height:auto;
+  min-height:64px;
+  box-sizing:border-box;
+  padding:8px 26px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-direction:row-reverse;
+  flex:0 0 auto;
+}
+#header #logo{
+  padding:0;
+  height:50px;
+  width:250px;               /* flex encolhia o link a 0 (img oculta) —
+                                largura explícita pro logo em background */
+  flex:0 0 auto;
+  max-width:none;
+}
+#header #logo img{ max-height:50px; }
+#header p, #header p#info{
+  background:transparent;
+  border:0;
+  margin:0;
+  padding:0;
+  max-width:none;
+  float:none;
+  font-size:13px;
+  color:#6b716c;
+}
+#header p#info a{ color:#4c7727; font-weight:600; }
+#header p#info strong{ color:#474B4F; }
+
+/* Nav grafite mais respirada, itens como pílulas (dropdowns seguem
+   ancorados no li — top:auto do core, altura do li preservada) */
+#nav{ padding:8px 26px; height:auto; flex:0 0 auto; }
+#nav .active, #nav .inactive{ border-radius:6px; }
+#sub_nav{ padding:12px 26px 4px; flex:0 0 auto; }
+
+/* Barras de aviso globais (error/warning/notice) viram faixas suaves */
+#error_bar, #warning_bar, #notice_bar{
+  margin:10px 26px 0;
+  border-radius:8px;
+  height:auto;
+}
+
+/* Conteúdo inteiro vira um cartão flutuando sobre o fundo suave */
+#content{
+  background:#fff;
+  border:1px solid #e8ebe6 !important;
+  border-radius:12px;
+  box-shadow:0 10px 30px -14px rgba(45,66,32,.16), 0 2px 6px rgba(0,0,0,.04);
+  margin:14px 26px 8px;
+  padding:18px 22px !important;
+}
+#footer{ color:#9aa09b; border:0; padding:6px 26px 20px; }
+
+/* ---- Sub-navegação: filas viram "chips" ---- */
+#sub_nav{
+  background:transparent;
+  border-bottom:0;
+  padding:10px 20px 4px;
+}
+#sub_nav > li > a,
+#customQ_nav .jb-overflowmenu-menu-primary li.item > a{
+  background-color:#fff;
+  border:1px solid #dfe3dd;
+  border-radius:16px;
+  padding:4px 13px 4px 27px;
+  background-position:9px 50%;
+  color:#474B4F;
+  transition:border-color .12s ease, background-color .12s ease, color .12s ease;
+}
+#sub_nav > li > a:hover{
+  border-color:#7AC143;
+  color:#649E37;
+}
+#sub_nav a.active, #sub_nav li.active > a, #sub_nav li.child.active > a{
+  border-color:#7AC143;
+  background-color:#eef7e6;
+  color:#474B4F;
+  font-weight:700;
+}
+#customQ_nav .jb-overflowmenu-menu-primary li.item:hover{
+  border:0; padding:3px 6px 4px; background:transparent;
+}
+/* contêiner auxiliar do plugin de overflow das filas: renderizava como
+   uma linha vertical cinza de 1px solta na tela */
+.jb-overflowmenu-container{ border:0 !important; }
+
+/* ---- Tabelas de listagem (filas, admin, painel de equipamentos) ---- */
+table.list{
+  width:100%;
+  background:#fff;
+  border:1px solid #e8ebe6;
+  border-bottom:1px solid #e8ebe6;
+  border-radius:10px;
+  border-collapse:separate;
+  border-spacing:0;
+  box-shadow:0 8px 24px -16px rgba(45,66,32,.2), 0 1px 4px rgba(0,0,0,.04);
+}
+table.list caption{
+  background:#f5f7f4;
+  color:#474B4F;
+  border-radius:10px 10px 0 0;
+  padding:8px 12px;
+}
+table.list thead th{
+  background-color:#f5f7f4;
+  color:#474B4F;
+  font-size:12px;
+  font-weight:600;
+  padding:9px 10px;
+  border-bottom:1px solid #e3e6e2;
+}
+table.list thead th:first-child{ border-top-left-radius:10px; }
+table.list thead th:last-child{ border-top-right-radius:10px; }
+table.list tbody tr:last-child td:first-child{ border-bottom-left-radius:10px; }
+table.list tbody tr:last-child td:last-child{ border-bottom-right-radius:10px; }
+table.list tbody td{
+  padding:9px 10px;
+  border-bottom:1px solid #f0f2ef;
+}
+table.list tbody tr:last-child td{ border-bottom:0; }
+/* zebra amarela/azul do core -> branco limpo com hover suave */
+table.list tbody tr:nth-child(2n+1) td{ background-color:#fff; }
+table.list tbody tr:hover td,
+table.list tbody tr:nth-child(2n+1):hover td{ background:#fafcf8; }
+table.list tbody tr.highlight td,
+table.list tbody tr:hover td{ background:#fafcf8; }
+table.list tbody tr.highlight td{ background:#eef7e6; }
+
+/* ---- Abas (tela do chamado, admin): sublinhado verde moderno ---- */
+ul.tabs:not(.vertical){
+  background:transparent;
+  border-bottom:2px solid #e6e9e4;
+  box-shadow:none;
+  height:auto;
+  padding:0 0 0 8px;
+}
+ul.tabs:not(.vertical) li{
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  bottom:0;
+  min-width:0;
+  border-radius:0;
+}
+ul.tabs:not(.vertical) li.active{
+  border:0;
+  border-bottom:3px solid #7AC143;
+  box-shadow:none;
+  background:transparent;
+  margin-bottom:-2px;
+}
+ul.tabs:not(.vertical) li a{
+  padding:8px 16px;
+  color:#6b716c;
+}
+ul.tabs:not(.vertical) li.active a{ color:#474B4F; }
+ul.tabs:not(.vertical) li:not(.active):hover a{ color:#649E37; }
+
+/* ---- Botões neutros: pílulas brancas (família do portal) ---- */
+.action-button, input[type=button], input[type=reset],
+.button:not(.primary):not(.green):not(.red):not(.dark){
+  border-radius:6px;
+  background:#fff;
+  box-shadow:0 0 0 1px #cfd5cc inset;
+  color:#474B4F;
+}
+.action-button:hover, input[type=button]:hover, input[type=reset]:hover,
+.button:not(.primary):not(.green):not(.red):not(.dark):hover{
+  background:#f5f7f4;
+  box-shadow:0 0 0 1px #474B4F inset;
+  color:#474B4F;
+}
+
+/* ---- Formulários: campos maiores com focus verde ---- */
+#content input[type=text],
+#content input[type=password],
+#content input[type=email],
+#content input[type=search],
+#content select,
+#content textarea{
+  border:1px solid #cfd5cc;
+  border-radius:7px;
+  padding:6px 9px;
+  background:#fff;
+}
+#content select{ padding:5px 8px; height:auto; }
+#content input[type=text]:focus,
+#content input[type=password]:focus,
+#content input[type=email]:focus,
+#content input[type=search]:focus,
+#content select:focus,
+#content textarea:focus{
+  border-color:#7AC143;
+  box-shadow:0 0 0 3px rgba(122,193,67,.15);
+  outline:none;
+}
+
+/* ---- Banners de mensagem: cantos suaves, paleta do portal ---- */
+#msg_notice, .success-banner, .notice-banner{
+  border:1px solid #649E37; background-color:#eef7e6;
+  border-radius:8px; padding:9px 12px 9px 36px;
+}
+#msg_warning, .warning-banner{
+  border:1px solid #e08a1e; background-color:#fff7e6;
+  border-radius:8px; padding:9px 12px 9px 36px;
+}
+#msg_error, .error-banner{
+  border:1px solid #c0392b; background-color:#fdecea;
+  border-radius:8px; padding:9px 12px 9px 36px;
+}
+#msg_info, .info-banner{
+  border:1px solid #cfe6b8; background-color:#f2f8ec; color:#4c6b33;
+  border-radius:8px; padding:9px 12px;
+}
+
+/* ---- Títulos de seção de formulário: filete verde da marca ---- */
+.form_table th h4, #content h2, .sticky.bar h2{
+  color:#474B4F;
+}
+#content > h2, #content form > h2{
+  padding-left:10px;
+  border-left:3px solid #7AC143;
+}
+
+/* ---- Diálogos / pop-ups e caixa "Carregando" (lado do agente) ----
+   O core (scp.css) desenha esses elementos com visual datado: a caixa de
+   loading é um retângulo cinza texturizado com texto laranja, e o dialog tem
+   borda azul. Além disso o dialog tem padding:1em, então uma faixa de título
+   colorida "flutuava" com folga em volta. Reestilizado no padrão ZKTeco:
+   cartão branco, cantos arredondados, cabeçalho grafite FLUSH (margem negativa
+   estica a faixa até a borda) com filete verde, e spinner verde. */
+
+/* Overlay de fundo — mais suave e neutro (era preto 50%) */
+#overlay{ background:#1b1e20; opacity:.45; }
+
+/* Caixa "Carregando ..." — cartão branco limpo, spinner verde.
+   IMPORTANTE: NÃO definir 'display' aqui. O core deixa #loading em
+   display:none e o scp.js alterna com show()/hide(). Se forçarmos
+   display:flex, a caixa fica visível para sempre no carregamento normal
+   (o JS só a esconde após navegação pjax) → trava em "Carregando". Por isso
+   o alinhamento é feito com vertical-align, sem flex. */
+#loading, #upgrading{
+  border:0; border-radius:14px; padding:16px 22px;
+  width:auto; min-width:230px;
+  background:#fff; background-image:none;   /* remove a textura do core */
+  color:#474B4F;
+  box-shadow:0 18px 50px -12px rgba(0,0,0,.45);
+  white-space:nowrap;
+}
+#loading i, #upgrading i{
+  color:#7AC143 !important; float:none;
+  font-size:22px !important; vertical-align:middle; margin-right:12px;
+}
+#loading h1, #upgrading h4{
+  display:inline-block; vertical-align:middle;
+  color:#474B4F; font-size:16.5px; font-weight:600; margin:0; padding:0;
+}
+
+/* Dialog / popup — cartão branco arredondado, sombra suave.
+   Fixamos padding em 16px (o core usa 1em) para casar EXATAMENTE com a
+   margem negativa do cabeçalho abaixo (senão a faixa ultrapassa ~2px). */
+.dialog{
+  border-radius:12px;
+  border:1px solid #e3e6e2;
+  background:#fff;
+  padding:16px;
+  box-shadow:0 24px 60px -12px rgba(0,0,0,.35);
+}
+/* Cabeçalho do dialog: faixa grafite colada nas bordas — a margem negativa
+   de -16px cancela o padding:16px do .dialog. Filete verde. */
+.dialog h3, .dialog h3.drag-handle{
+  background:#474B4F; color:#fff;
+  margin:-16px -16px 14px; padding:13px 46px 13px 16px;
+  border-radius:11px 11px 0 0; border-left:4px solid #7AC143;
+  font-size:16px; font-weight:600;
+}
+/* Botão de fechar (X) branco, no canto do cabeçalho */
+.dialog a.close, .dialog a.close i{ color:#fff; }
+.dialog a.close{ top:12px; right:14px; font-size:18px; opacity:.85; z-index:12; }
+.dialog a.close:hover{ opacity:1; }
+/* Spinner do carregamento interno do popup em verde */
+.dialog #popup-loading{ background:rgba(255,255,255,.85); border-radius:12px; }
+.dialog #popup-loading i{ color:#7AC143; }
+
+/* ---- FILA DE CHAMADOS: paridade visual com a lista do cliente ---- */
+/* nº do ticket: ícone FA verde no lugar do PNG por origem (web/email) */
+table.list .Icon.webTicket, table.list .Icon.emailTicket,
+table.list .Icon.phoneTicket, table.list .Icon.apiTicket,
+table.list .Icon.otherTicket{
+  background-image:none !important;
+  width:auto; height:auto;
+  padding:0 2px 0 0;
+}
+table.list .Icon.webTicket::before, table.list .Icon.emailTicket::before,
+table.list .Icon.phoneTicket::before, table.list .Icon.apiTicket::before,
+table.list .Icon.otherTicket::before{
+  font-family:FontAwesome;
+  content:"\f145";            /* icon-ticket */
+  color:#7AC143;
+  margin-right:5px;
+  font-weight:normal;
+}
+table.list tbody a.preview{ color:#474B4F; }
+table.list tbody a.preview:hover{ color:#649E37; }
+/* prioridade (e afins com cor vinda do banco): vira PÍLULA, mantendo a
+   cor configurada como fundo — em vez da célula inteira pintada */
+table.list td > div[style*="background-color"]{
+  display:inline-block;
+  padding:3px 12px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.07);
+  font-size:11.5px;
+  font-weight:600;
+  color:#5c5647;
+}
+/* assunto flui na largura da coluna (o template trava em 300px inline) */
+table.list .truncate{ max-width:none !important; }
+/* linhas mais respiradas */
+table.list tbody td{ padding:11px 10px; }
+table.list th:first-child, table.list td:first-child{ width:30px; text-align:center; }
+
+/* título da fila ("⟳ Aberto") no padrão dos cartões do cliente */
+.sticky.bar h2{ font-size:17px; font-weight:700; }
+.sticky.bar h2 a{ color:#474B4F; }
+.sticky.bar h2 a:hover{ color:#474B4F; text-decoration:none; }
+.sticky.bar h2 a i{ color:#7AC143; margin-right:4px; }
+
+/* ---- Busca das filas (.attached.input): dupla input+botão moderna ---- */
+#content .attached.input{
+  border:1px solid #cfd5cc;
+  border-radius:8px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:none;
+}
+#content .attached.input.focus{
+  border-color:#7AC143;
+  box-shadow:0 0 0 3px rgba(122,193,67,.15);
+}
+#content .attached.input input{
+  border:0 !important;
+  box-shadow:none !important;
+  border-radius:0;
+  padding:10px 14px;
+  min-width:340px;
+  font-size:13.5px;
+}
+#content .attached.input .button.attached,
+#content .attached.input button{
+  background:linear-gradient(180deg, #83cb4d, #6fb43a);
+  color:#fff;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  padding:0 14px;
+}
+
+/* ---- Barra fixa (busca/ordenar das filas, título do chamado) ---- */
+.sticky.bar .content{
+  background:transparent;          /* dentro do cartão, sem faixa cinza */
+  border-bottom:1px solid #eef1ed;
+}
+.sticky.bar.fixed .content{
+  background:#fff;                 /* quando gruda no topo, volta sólida */
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+/* ---- Bloco de informações do chamado: azul core -> ficha ZKTeco ---- */
+.ticket_info{
+  background:#f7f9f6;
+  border:1px solid #e8ebe6;
+  border-radius:10px;
+  width:100%;          /* o template fixa width=940 por atributo */
+}
+.ticket_info th{ color:#474B4F; }
+.ticket_info td{ padding:3px 6px; }
+.ticket_info.custom-data thead th{
+  background-color:transparent;
+  border-bottom:2px solid #e3e6e2;
+}
+
+/* ===== Painel de Equipamentos do AGENTE em cartão (paridade visual com o
+   painel do cliente). O visual base das barras/badges vem do <style> inline
+   de zk_equip_styles() (carregado nos dois lados); aqui só recriamos, para o
+   SCP, o "cartão" e a barra da Nota Fiscal que no cliente moram no theme.css
+   (que o SCP não carrega). Escopado em .zk-panel.zk-staff. ===== */
+.zk-panel.zk-staff{
+  background:#fff; border:1px solid #e3e6e2; border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05); overflow:hidden; margin:14px 0;
+}
+.zk-panel.zk-staff .zk-panel-head{
+  padding:10px 14px; background:#f5f7f4; border-bottom:1px solid #e3e6e2;
+  border-left:3px solid #7AC143;
+}
+.zk-panel.zk-staff .zk-panel-title{
+  border-left:0; padding-left:0; font-size:13.5px; margin:0;
+}
+.zk-panel.zk-staff .zk-panel-title i{ color:#7AC143; margin-right:4px; }
+/* respiro lateral do conteúdo, igual aos cartões do cliente (o form envolve
+   bulkbar+tabela+ações, então recebe a margem como filho direto) */
+.zk-panel.zk-staff > .zk-nf-bar,
+.zk-panel.zk-staff > .zk-nf-errors-box,
+.zk-panel.zk-staff > .zk-envio-bar,
+.zk-panel.zk-staff > .zk-progress-wrap,
+.zk-panel.zk-staff > form{ margin-left:16px; margin-right:16px; }
+.zk-panel.zk-staff > .zk-nf-bar{ margin-top:12px; }
+.zk-panel.zk-staff > .zk-envio-bar{ margin-top:10px; }
+.zk-panel.zk-staff > form{ margin-bottom:16px; }
+/* Barra da Nota Fiscal — mesma cara da barra "Envio do produto" */
+.zk-panel.zk-staff > .zk-nf-bar{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  padding:8px 12px; border:1px solid #e3e6e2; border-radius:6px;
+  background:#fafcf8; font-size:12.5px;
+}
+.zk-panel.zk-staff > .zk-nf-bar .zk-nf-link{
+  color:#649E37; font-weight:600; text-decoration:none;
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.zk-panel.zk-staff > .zk-nf-bar .zk-nf-link:hover{ text-decoration:underline; }
+.zk-panel.zk-staff > .zk-nf-bar .zk-nf-link i{ margin-right:2px; }
+
+/* ---- Fichas do topo do chamado LADO A LADO (ganha altura de tela) ----
+   As 2 primeiras fichas .ticket_info (Status/Usuário e Atribuição/Tópico)
+   ficavam empilhadas com muito espaço vazio à direita. Envolvidas por
+   .zk-info-cols (ticket-view.inc.php), dividem a largura em 2 colunas.
+   A 3ª ficha (.custom-data "Detalhes do chamado") fica FORA do wrap e
+   continua full-width. Escopado no wrap → não afeta org/usuário/tarefas. */
+.zk-info-cols{ display:flex; gap:16px; align-items:stretch; }
+.zk-info-cols > .ticket_info{ flex:1 1 0; width:auto; min-width:0; margin:0; }
+@media (max-width:900px){
+  .zk-info-cols{ flex-wrap:wrap; }
+  .zk-info-cols > .ticket_info{ flex-basis:100%; }
+}
+
+/* ===================================================================
+   CONTEÚDO dos pop-ups (dialogs) — modernização completa (2026-07-06)
+   A moldura (.dialog, h3, X, #loading) já foi tratada acima; este bloco
+   cuida do MIOLO: abas, tabela custom-info, avatar, links, inputs (os
+   dialogs vivem FORA de #content, então os campos ainda estavam crus),
+   botões (tamanho + destrutivos vermelhos), previews e quicknotes.
+   Mantido no FIM do arquivo de propósito: vence empates de especificidade
+   com as regras de cima. ======================================== */
+
+/* -- hr: mata o separador redundante logo abaixo do título (a faixa
+      grafite JÁ é o separador) e suaviza os demais (gradiente -> linha) -- */
+.dialog h3 + hr, .dialog h3 + b + hr, .dialog h3 + a.close + hr{ display:none; }
+.dialog hr{ background:#eef1ed; height:1px; margin:12px 0; }
+
+/* -- Links dentro do dialog: azul core -> verde ZK. As exclusões vão em
+      :where() (especificidade ZERO) para a regra ficar em (0,1,1): empata
+      com o .dialog a do core (vence por vir depois) e PERDE para as regras
+      de abas/botões abaixo — com :not() puro ela somava (0,4,1) e pintava
+      de verde até a aba ativa -- */
+.dialog a:where(:not(.action-button):not(.close):not(.action)){ color:#649E37; }
+.dialog a.action-button{ color:#474B4F; }
+
+/* -- Título h2 dos previews (Chamado #123: ...) -- */
+.dialog h2, .tip_content h2{ color:#474B4F; font-size:15.5px; }
+
+/* -- Abas dentro do dialog: barra com underline contínuo (estilo moderno)
+      no lugar das "abas de pasta" azuis do core -- */
+.dialog ul.tabs{
+  display:flex; gap:2px; margin:14px 0; padding:0;
+  list-style:none; border:0; border-bottom:1px solid #e6e9e4;
+}
+.dialog ul.tabs li{ margin:0; border:0; background:none; }
+.dialog ul.tabs li a{
+  display:block; padding:8px 14px; margin-bottom:-1px;
+  border:0; background:transparent; border-radius:0;
+  color:#6b716c; font-weight:600; font-size:13px;
+  border-bottom:2px solid transparent;
+}
+.dialog ul.tabs li a:hover{ color:#474B4F; }
+.dialog ul.tabs li a i{ color:#9aa09b; }
+.dialog ul.tabs li.active a{ color:#474B4F; border-bottom-color:#7AC143; }
+.dialog ul.tabs li.active a i{ color:#7AC143; }
+
+/* -- table.custom-info ("Informações de contato"): linhas pontilhadas
+      pretas do core -> seção com filete verde + linhas suaves -- */
+.dialog table.custom-info th{
+  background:transparent; border:none;
+  border-left:3px solid #7AC143; border-bottom:1px solid #e6e9e4;
+  color:#474B4F; font-size:13px; padding:10px 0 7px 8px;
+}
+.dialog table.custom-info td{
+  border-bottom:1px solid #f0f2ef; padding:7px 6px; color:#555;
+}
+.dialog table.custom-info tr > td:first-child{
+  color:#8a8f8a; font-weight:600; font-size:12px;
+}
+/* th genérico de dialog/tip (form render, previews): some o #eee pontilhado */
+.dialog th, .tip_box th{
+  background:transparent; border:none; color:#474B4F; padding:5px 4px;
+}
+/* células de .table dentro do dialog: o core força #f8f8f8 !important
+   (fundo antigo do dialog); agora o dialog é branco */
+.dialog .table td:not(:empty){ background-color:#fff !important; }
+
+/* -- Avatar e placeholder (ícone gigante de usuário/organização) -- */
+.dialog .avatar img, .dialog img.avatar{
+  border-radius:14px; border:1px solid #e3e6e2; background:#f5f7f4;
+}
+.dialog i.icon-4x.icon-border{
+  border:1px solid #e3e6e2; border-radius:14px; padding:14px;
+  color:#c3c9c1; background:#f5f7f4;
+}
+
+/* -- Ícones de ação flutuantes (editar/compartilhar) e quicknotes:
+      hover laranja do core -> verde ZK (global: também fora de dialog) -- */
+.floating-options a.action:hover, .quicknote .options a.action:hover{
+  border-color:#7AC143; background:#eef7e6; border-radius:4px;
+}
+
+/* -- Campos de formulário dentro do dialog (fora de #content, estavam
+      com o visual cru do core): mesmo padrão dos campos do #content -- */
+.dialog input[type=text], .dialog input[type=email], .dialog input[type=password],
+.dialog input[type=search], .dialog input[type=tel], .dialog input[type=number],
+.dialog fieldset input:not([type=checkbox]),
+.dialog select, .dialog textarea{
+  border:1px solid #cfd5cc; border-radius:7px; padding:6px 9px;
+  background:#fff; color:#555; font-size:13px;
+}
+.dialog input[type=text]:focus, .dialog input[type=email]:focus,
+.dialog input[type=password]:focus, .dialog input[type=search]:focus,
+.dialog input[type=tel]:focus, .dialog input[type=number]:focus,
+.dialog fieldset input:not([type=checkbox]):focus,
+.dialog select:focus, .dialog textarea:focus{
+  border-color:#7AC143; box-shadow:0 0 0 3px rgba(122,193,67,.15); outline:none;
+}
+/* busca dos lookups (Alterar Usuário etc.): campo de destaque */
+.dialog input.search-input{ padding:10px 12px; font-size:14px; border-radius:8px; }
+/* -- <select> nos dialogs: o core fixa height:24px e, com box-sizing:border-box
+      + padding 6px em cima/baixo, o TEXTO era CORTADO (bug visto em Atualizar
+      prioridade/SLA/tópico/transferir). Solta a altura e dá espaço. -- */
+.dialog select{
+  height:auto; min-height:34px; padding:6px 10px; min-width:200px;
+  line-height:1.3; box-sizing:border-box;
+}
+
+/* -- Botões dentro do dialog: maiores/modernos (o core usa 22px de altura).
+      Cores: primário já vem do gradiente verde global; neutros da pílula
+      branca global — aqui só tamanho/radius -- */
+.dialog input[type=submit], .dialog input[type=button], .dialog input[type=reset],
+.dialog .button, .dialog a.action-button{
+  height:auto; line-height:1.25; padding:8px 18px;
+  font-size:13px; border-radius:6px;
+}
+/* -- Botões DESTRUTIVOS (class="red button"): o gradiente verde global
+      pintava até o "Excluir" de verde. Vermelho sólido, global -- */
+input[type=submit].red.button, .dialog .red.button{
+  background:#c0392b; color:#fff; box-shadow:0 1px 4px rgba(192,57,43,.35);
+}
+input[type=submit].red.button:hover, .dialog .red.button:hover{
+  background:#a5281b; color:#fff; box-shadow:0 2px 6px rgba(165,40,27,.4);
+}
+
+/* -- "Loading..." interno do popup (véu branco já tratado acima) -- */
+.dialog #popup-loading h1{
+  color:#474B4F; font-size:16px; font-weight:600; padding-top:28px;
+}
+
+/* -- Previews de hover (.tip_content — ticket/tarefa ao passar o mouse):
+      borda #666 e sombra dura do core -> cartão ZK -- */
+.tip_content{
+  border:1px solid #e3e6e2; border-radius:10px; padding:12px 14px;
+  box-shadow:0 16px 40px -12px rgba(0,0,0,.3);
+}
+.tip_content hr{ background:#eef1ed; height:1px; border:0; }
+
+/* ===================================================================
+   POP-UP DE USUÁRIO (user.tmpl.php) — cabeçalho de identidade limpo
+   (2026-07-07). O template foi reorganizado num bloco flex .zk-user-head
+   (avatar | nome+email+org | botão) no lugar do layout com floats antigo.
+   ================================================================ */
+.dialog #user-profile{ margin:2px 2px 0; }
+
+/* Cabeçalho: avatar à esquerda, identidade no meio, botão à direita —
+   tudo centralizado verticalmente, com filete separador embaixo. */
+.dialog .zk-user-head{
+  display:flex; align-items:center; gap:14px;
+  padding-bottom:14px; border-bottom:1px solid #eef1ed;
+}
+.dialog .zk-user-head .avatar{
+  float:none; margin:0; flex:0 0 auto; line-height:0;
+}
+/* Avatar quadrado, arredondado, recortado (a img do gravatar vem ~82px) */
+.dialog .zk-user-head .avatar img,
+.dialog .zk-user-head .avatar .avatar{
+  width:58px !important; height:58px !important; object-fit:cover;
+  border-radius:12px; border:1px solid #e3e6e2; background:#f5f7f4;
+  display:block; padding:0;
+}
+.dialog .zk-user-id{ flex:1 1 auto; min-width:0; }
+.dialog .zk-user-name{ font-size:15.5px; color:#474B4F; line-height:1.25; }
+.dialog .zk-user-name b{ font-weight:700; }
+.dialog .zk-user-id .faded{
+  color:#8a8f8a; font-size:12.5px; margin-top:1px;
+  overflow-wrap:anywhere;
+}
+.dialog .zk-user-org{ margin-top:4px; font-size:12.5px; color:#5c635c; }
+/* Botão "Alterar Usuário": pílula clara alinhada ao centro do cabeçalho */
+.dialog .zk-user-head .change-user{
+  flex:0 0 auto; align-self:center; white-space:nowrap; margin:0;
+}
+
+/* Ícones de ação (editar / gerenciar) do miolo: em vez de flutuarem num
+   vão vazio, ancoram no canto superior direito da aba, alinhados ao
+   título da seção "Informações de contato". */
+.dialog #info-tab, .dialog #org-tab{ position:relative; padding-top:4px; }
+.dialog #info-tab > .floating-options,
+.dialog #org-tab > .floating-options{
+  position:absolute; top:10px; right:0; display:flex; gap:6px; margin:0;
+}
+.dialog .floating-options a.action{
+  width:26px; height:26px; line-height:26px; text-align:center;
+  border-radius:6px; color:#8a8f8a; border:1px solid transparent;
+}
+.dialog .floating-options a.action:hover{
+  color:#649E37; background:#eef7e6; border-color:#dcebcf;
+}
+/* Empurra a tabela de contato para baixo dos ícones (evita colisão) */
+.dialog #info-tab table.custom-info,
+.dialog #org-tab table.custom-info{ margin-top:2px; }
+
+/* "Nova nota" (aba Notas) como bloco tracejado clicável, não link cru */
+.dialog #new-note .body a{
+  display:block; padding:14px; border:1px dashed #cfd5cc; border-radius:8px;
+  color:#8a8f8a; text-align:center; background:#fafcf8;
+}
+.dialog #new-note .body a:hover{
+  border-color:#7AC143; color:#649E37; background:#f2f9ea;
+}
+.dialog #new-note .body a i{ color:#7AC143; }
+
+/* ===================================================================
+   CALENDÁRIO (jQuery UI datepicker) — tema ZK (2026-07-07)
+   Usado no "Atualizar Data de Vencimento" e afins. É anexado ao <body>
+   (#ui-datepicker-div), FORA de .dialog, com o tema laranja padrão do
+   jQuery UI. Aqui recriamos no padrão grafite/verde. ================ */
+#ui-datepicker-div.ui-datepicker{
+  background:#fff; border:1px solid #e3e6e2; border-radius:10px;
+  box-shadow:0 16px 40px -12px rgba(0,0,0,.3); padding:0;
+  overflow:hidden; font-family:inherit;
+}
+/* cabeçalho (mês/ano) grafite, no lugar do laranja */
+#ui-datepicker-div .ui-datepicker-header{
+  background:#474B4F; border:0; border-radius:0; color:#fff; padding:8px 0;
+}
+#ui-datepicker-div .ui-datepicker-title{ color:#fff; font-weight:600; font-size:13px; }
+#ui-datepicker-div .ui-datepicker-prev, #ui-datepicker-div .ui-datepicker-next{ cursor:pointer; top:6px; }
+#ui-datepicker-div .ui-datepicker-prev span, #ui-datepicker-div .ui-datepicker-next span{
+  filter:brightness(0) invert(1);   /* setas brancas */
+}
+/* mantém os 2 meses lado a lado (só espaça as tabelas, sem padding no grupo
+   — padding no grupo estourava a largura e empilhava os meses) */
+#ui-datepicker-div .ui-datepicker-group{ padding:0; }
+#ui-datepicker-div .ui-datepicker-group table{ margin:6px 6px 8px; }
+#ui-datepicker-div table.ui-datepicker-calendar{ font-size:12.5px; }
+#ui-datepicker-div .ui-datepicker-calendar th{ color:#8a8f8a; font-weight:600; padding:5px 0; }
+#ui-datepicker-div .ui-datepicker-calendar td{ padding:1px; }
+/* dias: azul do core -> grafite; hover verde suave */
+#ui-datepicker-div .ui-datepicker-calendar td a,
+#ui-datepicker-div .ui-datepicker-calendar td span{
+  border:0 !important; background:transparent !important; color:#474B4F !important;
+  text-align:center; padding:6px 0; border-radius:6px;
+}
+#ui-datepicker-div .ui-datepicker-calendar td a:hover{ background:#eef7e6 !important; color:#649E37 !important; }
+/* hoje: contorno verde; selecionado: preenchido verde */
+#ui-datepicker-div .ui-datepicker-today a, #ui-datepicker-div .ui-state-highlight{
+  background:#f2f9ea !important; color:#649E37 !important; font-weight:700;
+  box-shadow:inset 0 0 0 1px #cfe6b3;
+}
+#ui-datepicker-div .ui-state-active, #ui-datepicker-div .ui-datepicker-current-day a{
+  background:#7AC143 !important; color:#fff !important; font-weight:700;
+}
+#ui-datepicker-div .ui-datepicker-other-month a{ color:#c3c9c1 !important; }
+/* bloco de hora (Time/Hour) */
+#ui-datepicker-div .ui-timepicker-div{ padding:6px 12px 2px; }
+#ui-datepicker-div .ui-timepicker-div dt,
+#ui-datepicker-div .ui-timepicker-div .ui_tpicker_time_label{ color:#474B4F; font-weight:600; font-size:12.5px; }
+#ui-datepicker-div select{
+  border:1px solid #cfd5cc; border-radius:6px; padding:4px 8px;
+  min-height:30px; height:auto; background:#fff; color:#474b4f; font-size:12.5px;
+}
+#ui-datepicker-div input[type=text]{ border:1px solid #cfd5cc; border-radius:6px; padding:5px 8px; }
+/* rodapé (Now / Done) */
+#ui-datepicker-div .ui-datepicker-buttonpane{
+  border-top:1px solid #eef1ed; padding:8px 12px; margin:0; background:#fafcf8;
+}
+#ui-datepicker-div .ui-datepicker-buttonpane button{
+  background:#f4f6f2; border:1px solid #d7dcd4; color:#474B4F; border-radius:6px;
+  padding:5px 14px; font-weight:600; cursor:pointer; opacity:1;
+}
+#ui-datepicker-div .ui-datepicker-buttonpane button.ui-priority-primary,
+#ui-datepicker-div .ui-datepicker-buttonpane button.ui-datepicker-close{
+  background:linear-gradient(180deg,#83cb4d,#6fb43a); border:0; color:#fff;
+}
+
+/* ===================================================================
+   BUSCA + FILTRO AVANÇADO na mesma linha (2026-08-20) — o link vinha
+   depois do </form>; como form é bloco, o link (inline) sempre quebrava
+   pra uma linha própria embaixo da busca. Agora os dois são filhos de
+   um flex container. ================================================ */
+#basic_search .zk-search-row{
+  display:flex; align-items:center; flex-wrap:wrap; gap:4px;
+}
+#basic_search .zk-search-row form{ margin:0; }
+
+/* "Limpar filtro" (2026-08-20) — sempre visível na barra de busca quando
+   há uma busca simples ou filtro avançado ativo (antes só existia dentro
+   do painel avançado, que precisa estar aberto pra aparecer). */
+.zk-clear-filter{
+  display:inline-flex; align-items:center; gap:3px;
+  margin-left:8px; color:#8a8f8a; font-weight:600;
+  font-size:12.5px; text-decoration:none; white-space:nowrap;
+}
+.zk-clear-filter:hover{ color:#c0392b; }
+
+/* ===================================================================
+   FILTRO AVANÇADO INLINE (2026-07-07) — substitui o popup de Pesquisa
+   Avançada. Barra: link .zk-advfilter-toggle; painel: #zk-advfilter. === */
+.zk-advfilter-toggle{
+  display:inline-block; margin-left:10px; color:#649E37; font-weight:600;
+  font-size:12.5px; text-decoration:none; white-space:nowrap;
+}
+.zk-advfilter-toggle:hover{ color:#474B4F; }
+.zk-advfilter-toggle i{ margin-right:3px; }
+.zk-advfilter-toggle.open, .zk-advfilter-toggle.active{ color:#474B4F; }
+/* Seta que indica/recolhe o painel (2026-08-21) — gira ao abrir, mesmo
+   clique do link (.zk-advfilter-toggle) já fecha/abre o #zk-advfilter. */
+.zk-advfilter-caret{
+  margin-left:4px !important; font-size:10px;
+  transition:transform .15s ease;
+}
+.zk-advfilter-toggle.open .zk-advfilter-caret{ transform:rotate(180deg); }
+
+.zk-advfilter{
+  clear:both; margin:12px 0 4px; padding:16px 18px;
+  background:#fff; border:1px solid #e3e6e2; border-left:4px solid #7AC143;
+  border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+.zk-advfilter-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+  gap:12px 16px;
+}
+.zk-advfilter-kw{ grid-column:1 / -1; }   /* palavra-chave ocupa a linha toda */
+.zk-advfilter-field{ display:flex; flex-direction:column; gap:4px; margin:0; }
+.zk-advfilter-field > span{
+  font-size:11.5px; font-weight:600; color:#8a8f8a; text-transform:uppercase;
+  letter-spacing:.03em;
+}
+.zk-advfilter-field input[type=text],
+.zk-advfilter-field input[type=date],
+.zk-advfilter-field select{
+  width:100%; box-sizing:border-box; height:auto; min-height:36px;
+  padding:7px 10px; border:1px solid #cfd5cc; border-radius:7px;
+  background:#fff; color:#474B4F; font-size:13px;
+}
+.zk-advfilter-field input:focus,
+.zk-advfilter-field select:focus{
+  border-color:#7AC143; box-shadow:0 0 0 3px rgba(122,193,67,.15); outline:none;
+}
+.zk-advfilter-actions{
+  display:flex; align-items:center; justify-content:flex-end; gap:14px;
+  margin-top:14px; padding-top:12px; border-top:1px solid #eef1ed;
+}
+.zk-advfilter-clear{
+  color:#8a8f8a; font-size:12.5px; font-weight:600; text-decoration:none;
+}
+.zk-advfilter-clear:hover{ color:#c0392b; }
+.zk-advfilter-apply{
+  background:linear-gradient(180deg,#83cb4d,#6fb43a); color:#fff; border:0;
+  border-radius:7px; padding:9px 22px; font-size:13px; font-weight:600;
+  cursor:pointer; box-shadow:0 1px 4px rgba(111,180,58,.35);
+}
+.zk-advfilter-apply:hover{ background:linear-gradient(180deg,#7cc245,#659f33); }
+.zk-advfilter-apply i{ margin-right:4px; }
+
+/* ===================================================================
+   BOTÕES "RECOMEÇAR FORMULÁRIO" (reset) — ocultos globalmente (2026-07-07)
+   Conceito antigo/sem uso real (só limpa o form). Em vez de editar ~60
+   templates, escondemos todos os controles type=reset do painel de equipe.
+   Reversível: basta remover este bloco. =========================== */
+input[type=reset], button[type=reset]{ display:none !important; }
+
+/* ===================================================================
+   THREAD DO CHAMADO — redesenho "timeline de cartões" (2026-07-07)
+   Substitui o visual antigo do osTicket (barras azul/laranja, caixas de
+   borda dura, balões com biquinho, eventos com recorte branco) por
+   cartões claros com faixa de acento lateral e eventos discretos.
+   100% CSS: a marcação continua a original (include/staff/templates/
+   thread-entry.tmpl.php e thread-event.tmpl.php). Reversível: basta
+   remover este bloco.
+   Paleta: verde #7AC143 · verde escuro #649E37 · grafite #474B4F.
+   =================================================================== */
+
+/* Respiro do container da conversa */
+#ticket_thread{ padding-top:6px; }
+
+/* ---------- Cartão de cada entrada (mensagem / resposta / nota) ------ */
+.thread-entry{
+  position:relative;
+  margin-bottom:18px;
+  background:#fff;
+  border:1px solid #e6e9e4;
+  border-radius:12px;
+  box-shadow:0 1px 2px rgba(71,75,79,.05), 0 8px 20px -14px rgba(71,75,79,.22);
+}
+/* remove separadores brancos (::before/::after do tema) e os biquinhos
+   dos balões que ligavam header ao avatar */
+.thread-entry::after{ display:none; }
+.thread-entry.avatar .header:before,
+.thread-entry.avatar .header:after{ display:none !important; }
+
+/* faixa de acento lateral por tipo — reaproveita o ::before do tema */
+.thread-entry::before{
+  content:""; display:block; border:0;
+  position:absolute; left:0; top:0; bottom:0; width:4px;
+  border-radius:12px 0 0 12px;
+  background:#cfd5cc;
+}
+.thread-entry.response::before{ background:#7AC143; } /* resposta do agente */
+.thread-entry.message::before { background:#9fb2c9; } /* mensagem do cliente */
+.thread-entry.note::before    { background:#e8b64a; } /* nota interna       */
+.thread-entry.system::before  { background:#cfd5cc; }
+
+/* nota interna: leve tom âmbar para diferenciar do resto */
+.thread-entry.note{ background:#fffdf5; border-color:#f0e6c8; }
+
+/* ---------- Cabeçalho (autor + data + assunto) ---------- */
+.thread-entry .header{
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  padding:12px 18px 6px 22px;
+  font-size:13px;
+  color:#6b7075;
+}
+.thread-entry .header b{ color:#2f3336; font-weight:700; }
+.thread-entry .header time,
+.thread-entry .header .relative{ color:#9aa0a4; font-weight:500; }
+.thread-entry .header .title{
+  margin-left:12px;
+  padding:2px 9px;
+  background:#f2f4ef;
+  border-radius:20px;
+  font-size:11.5px; font-weight:600;
+  color:#7a8085;
+  vertical-align:middle;
+}
+.thread-entry.note .header .title{ background:#f6eecf; color:#9a7d2e; }
+/* etiquetas (Editado, Cc, etc.) mais discretas */
+.thread-entry .header .label-bare{ color:#aeb3ad; }
+
+/* ---------- Corpo da mensagem ---------- */
+.thread-entry .thread-body{
+  border:0 !important;
+  border-radius:0 !important;
+  padding:2px 18px 16px 22px;
+  color:#3d4247;
+  font-size:13.5px;
+  line-height:1.62;
+}
+
+/* ---------- Avatares: círculos limpos ---------- */
+.thread-entry > .avatar{ width:42px; max-height:42px; }
+.avatar, .avatar > img.avatar, img.avatar{ border-radius:50%; }
+
+/* ---------- Anexos: bloco neutro na paleta verde ---------- */
+.thread-body .attachments{
+  background:#f6faf1;
+  border-top:1px dashed #dfe8d3;
+  border-radius:9px;
+  margin:12px 0 0;
+  top:0;
+  padding:8px 12px;
+}
+.thread-body .attachment-info .filename{ color:#5a7d33; }
+
+/* ---------- Eventos de sistema (alterou o estado, criado por…) ------- */
+.thread-event{
+  margin-left:22px;
+  padding:5px 2px 12px;
+  font-size:12.5px;
+  color:#8a8f8a;
+}
+.thread-event .type-icon{
+  width:24px; height:24px;
+  padding:0; line-height:24px;
+  border-radius:50%;
+  background:#eef4e7;
+  border:1px solid #dbe7cd;
+  color:#6fb43a;
+  font-size:11px;
+}
+.thread-event .type-icon i{ vertical-align:middle; }
+.thread-event .type-icon::after{ display:none; } /* remove recorte branco */
+.thread-event .type-icon.dark{
+  background:#e7eef0; border-color:#cdd7da; color:#7d868b;
+}
+.thread-event .description{ color:#8a8f8a; }
+.thread-event .description b{ color:#5f6469; font-weight:600; }
+
+/* ---------- Abas da resposta (Publicar Resposta / Nota Interna) ------ */
+#response_options{
+  background:#fff;
+  border:1px solid #e3e6e2;
+  border-radius:10px;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+  padding:4px 18px 18px;
+  margin-top:14px;
+}
+#response-tabs{ border-bottom:1px solid #e6e9e4; }
+#response-tabs li a{ color:#8a8f8a; font-weight:600; }
+#response-tabs li.active a,
+#response-tabs li a:hover{ color:#649E37; }
+#response-tabs li.active a{ border-bottom:2px solid #7AC143; }
+
+/* ---------- Campos do formulário (De/Destinatários/Responder a) ------
+   O core desenha esses campos como <table cellpadding=3> crua, sem
+   hierarquia (mesma fonte/peso do valor para o rótulo, colunas
+   coladas). O seletor td[width="120"] pega só as células de rótulo
+   (é o atributo HTML que o template já usa em cada linha de campo —
+   evita depender de :first-child, que também pegaria a célula
+   colspan=2 do editor de resposta). O select em si já ganha borda/
+   raio pela regra global "#content select"; aqui só ajustamos
+   respiro e largura mínima. */
+#reply table td[width="120"]{
+  padding:9px 8px 9px 0;
+  vertical-align:top;
+}
+#reply table td[width="120"] label{
+  color:#474B4F;
+  font-size:12.5px;
+  font-weight:600;
+  white-space:nowrap;
+}
+#reply table td:not([width]){
+  padding:8px 6px;
+}
+#reply select#from_email_id{
+  min-width:260px;
+}
+#reply input#cc_emails{
+  min-width:320px;
+}
+
+/* ---------- Eventos de sistema: OCULTOS na conversa (2026-07-07) ------
+   "Criado por…" e "alterou o estado para…" poluíam a thread e são apenas
+   informativos (o histórico continua registrado no log do chamado).
+   Ocultamos também o conector pontilhado da timeline (#thread-items::before),
+   que sem os eventos perde a função. Reversível: remova este bloco. */
+.thread-event{ display:none !important; }
+#thread-items::before{ display:none !important; }
+
+/* ===== ZK: botão de histórico recolhido da thread ===== */
+.zk-thread-toggle{ display:inline-flex; align-items:center; gap:7px; cursor:pointer; margin:4px 0 16px; padding:8px 15px; border:1px solid #d7ddd2; border-radius:9px; background:#f4f7f1; color:#4f7f26; font-weight:600; font-size:13px; line-height:1; transition:background .15s; }
+.zk-thread-toggle:hover{ background:#e9f0e1; }
+.zk-thread-toggle i{ font-size:12px; }
+
+/* ===== ZK: card de ATRASO (chamativo/moderno) ===== */
+.zk-overdue-card{ display:flex; align-items:center; gap:14px; margin:14px 0; padding:14px 18px; background:linear-gradient(135deg,#fff5f5 0%,#ffe7e7 100%); border:1px solid #f2b1b1; border-left:5px solid #e0402f; border-radius:12px; box-shadow:0 4px 14px rgba(224,64,47,.13); }
+.zk-overdue-ico{ flex:0 0 auto; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:#e0402f; color:#fff; font-size:19px; animation:zkOverduePulse 1.8s infinite; }
+.zk-overdue-txt{ display:flex; flex-direction:column; line-height:1.35; }
+.zk-overdue-title{ font-size:16px; font-weight:800; letter-spacing:.5px; color:#c0392b; text-transform:uppercase; }
+.zk-overdue-sub{ font-size:13px; color:#8a4b45; }
+@keyframes zkOverduePulse{ 0%{ box-shadow:0 0 0 0 rgba(224,64,47,.45); } 70%{ box-shadow:0 0 0 12px rgba(224,64,47,0); } 100%{ box-shadow:0 0 0 0 rgba(224,64,47,0); } }
+
+/* ===================================================================
+   BARRA DE AÇÕES EM MASSA DA FILA — comportamento estilo Gmail (2026-08-20)
+   Ticket::agentActions() (status/atribuir/mesclar/vincular/transferir/
+   excluir) ficava sempre visível na barra da fila mesmo sem nenhum
+   chamado selecionado — poluição visual constante. Agora some por
+   padrão e só aparece quando >=1 checkbox é marcado, junto com um
+   checkbox "selecionar tudo" no cabeçalho da tabela (antes essa coluna
+   ficava vazia; só havia os links de texto Selecionar: Todos/Nenhum/
+   Alternar no rodapé, mantidos intactos). JS correspondente no fim de
+   queue-tickets.tmpl.php (reaproveita #selectAll/#selectNone do core,
+   scp.js). Reversível: remova este bloco + o <script> do template. === */
+#zk-bulkbar{
+  display:none;
+  align-items:center;
+  gap:8px;
+}
+#zk-bulkbar.zk-bulkbar-active{
+  display:inline-flex;
+}
+.zk-bulkbar-count{
+  font-size:12.5px;
+  font-weight:700;
+  color:#474B4F;
+  min-width:1em;
+}
+.zk-bulkbar-clear{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:22px; height:22px;
+  border-radius:50%;
+  color:#8a8f8a;
+}
+.zk-bulkbar-clear:hover{
+  background:#f0f2ef;
+  color:#474B4F;
+}
+
+/* Checkbox "selecionar tudo" no cabeçalho + checkboxes das linhas:
+   maiores, com o verde da marca (accent-color) no lugar do azul nativo */
+table.list.queue.tickets thead th.zk-ckb-col{ text-align:center; }
+table.list.queue.tickets input#zk-select-all,
+table.list.queue.tickets input.ckb{
+  width:15px; height:15px;
+  cursor:pointer;
+  accent-color:#7AC143;
+  vertical-align:middle;
+}
+
+/* Links de texto "Selecionar: Todos/Nenhum/Alternar" no rodapé da tabela
+   (2026-08-20) — redundantes agora que o cabeçalho tem o checkbox
+   "selecionar tudo". Escondidos por CSS (não removidos do PHP): o script
+   do #zk-select-all dispara clique em #selectAll/#selectNone, então os
+   links continuam precisando existir no DOM. */
+table.list.queue.tickets tfoot .zk-legacy-select{ display:none; }
+
+/* =====================================================================
+   ZK: responsividade — evita colunas/fichas CORTADAS em telas estreitas.
+   ===================================================================== */
+/* As fichas .ticket_info (.zk-info-cols) têm o atributo HTML width="940"
+   e th/td sem quebra — textos longos (e-mail, telefone) vazavam para
+   fora da coluna em vez de encolher, mesmo com o wrap de 900px abaixo. */
+.zk-info-cols > .ticket_info{ table-layout:fixed; }
+.zk-info-cols > .ticket_info td,
+.zk-info-cols > .ticket_info th{ word-break:break-word; overflow-wrap:anywhere; }
+@media (max-width:900px){
+  /* .sidebar (scp.css): usado na FAQ (faq-view.inc.php) — float:right e
+     width:220px fixos, sem nenhum @media que os desfaça; a coluna ficava
+     espremida/cortada ao lado do conteúdo em telas estreitas. */
+  .sidebar{ float:none; width:auto; margin-left:0; }
+  /* #header: logo com largura fixa (250px) + linha de links (Bem-vindo/
+     Painel/Ajuda/Perfil/Sair, agora com ícones) espremida ao lado — em
+     telas estreitas os links só quebravam dentro do mesmo <p>, deixando
+     o cabeçalho alto e desalinhado. Agora empilha: logo primeiro,
+     depois a linha de links ocupando a largura toda. */
+  #header{ flex-wrap:wrap; row-gap:8px; }
+  #header #logo{ width:auto; }
+  #header p#info{ flex:1 1 100%; text-align:right; }
+}
+

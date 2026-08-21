@@ -1,0 +1,22 @@
+# Segredos
+.env
+
+# Backups e dumps (contêm dados reais de clientes)
+/backups/
+/db/init/*.sql
+
+# Dados do banco (volume) — não aplicável (volume gerenciado), mas por segurança
+/db/data/
+
+# Logs
+*.log
+
+# Sistema
+Thumbs.db
+Desktop.ini
+
+# ---------------------------------------------------------------------------
+# OBS: a pasta /app (código do osTicket + customizações) NÃO está ignorada
+# de propósito — é o que você versiona para publicar. Se preferir NÃO
+# versionar a aplicação (por causa das libs de terceiros), descomente:
+# /app/
