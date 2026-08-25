@@ -13,7 +13,7 @@
 
     vim: expandtab sw=4 ts=4 sts=4:
 **********************************************************************/
-require('client.inc.php');
+require('client.inc.php'); // já carrega class.turnstile.php via main.inc.php
 define('SOURCE','Web'); //Ticket source.
 $ticket = null;
 $errors=array();
@@ -28,11 +28,12 @@ if ($_POST) {
     $vars['deptId']=$vars['emailId']=0; //Just Making sure we don't accept crap...only topicId is expected.
     if ($thisclient) {
         $vars['uid']=$thisclient->getId();
-    } elseif($cfg->isCaptchaEnabled()) {
-        if(!$_POST['captcha'])
-            $errors['captcha']=__('Enter text shown on the image');
-        elseif(strcmp($_SESSION['captcha'], md5(strtoupper($_POST['captcha']))))
-            $errors['captcha']=sprintf('%s - %s', __('Invalid'), __('Please try again!'));
+    // ZK-SEC: CAPTCHA Cloudflare Turnstile no lugar do CAPTCHA de imagem
+    // legado do core. Só entra em jogo se clients_only for desligado no
+    // futuro (hoje require_once('secure.inc.php') acima já barra guests).
+    } elseif (Turnstile::isConfigured()
+            && !Turnstile::verify($_POST['cf-turnstile-response'] ?? null)) {
+        $errors['captcha']=sprintf('%s - %s', __('Invalid'), __('Please try again!'));
     }
 
     $tform = TicketForm::objects()->one()->getForm($vars);

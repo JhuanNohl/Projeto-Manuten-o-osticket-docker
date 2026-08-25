@@ -6,7 +6,12 @@ $signin_url = ROOT_PATH . "login.php"
 $signout_url = ROOT_PATH . "logout.php?auth=".$ost->getLinkToken();
 
 header("Content-Type: text/html; charset=UTF-8");
-header("Content-Security-Policy: frame-ancestors ".$cfg->getAllowIframes()."; script-src 'self' 'unsafe-inline'; object-src 'none'");
+// ZK-SEC: script-src precisa liberar challenges.cloudflare.com quando o
+// Turnstile está configurado (script + iframe do widget), senão o próprio
+// CSP do core bloqueia o CAPTCHA silenciosamente.
+$__zk_script_src = "'self' 'unsafe-inline'"
+    . ((class_exists('Turnstile') && Turnstile::isConfigured()) ? ' https://challenges.cloudflare.com' : '');
+header("Content-Security-Policy: frame-ancestors ".$cfg->getAllowIframes()."; script-src ".$__zk_script_src."; object-src 'none'");
 
 if (($lang = Internationalization::getCurrentLanguage())) {
     $langs = array_unique(array($lang, $cfg->getPrimaryLanguage()));

@@ -53,6 +53,11 @@ services:
       OST_DBNAME: ${DB_NAME}
       OST_DBUSER: ${DB_USER}
       OST_DBPASS: ${DB_PASSWORD}
+      # Cloudflare Turnstile (CAPTCHA) — vazio = desligado (dev local).
+      OST_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY}
+      OST_TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY}
+      # Ranges de IP confiáveis (proxy/CDN na frente) para X-Forwarded-For/-Proto.
+      OST_TRUSTED_PROXIES: ${TRUSTED_PROXIES}
     ports:
       - "${APP_PORT}:80"
     volumes:

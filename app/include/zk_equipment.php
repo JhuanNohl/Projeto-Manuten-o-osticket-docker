@@ -126,6 +126,42 @@ function zk_equip_pendencia_color($key) {
     return isset($p[$key]) ? $p[$key]['color'] : '#9aa0a6';
 }
 
+/* ------------------------------------------------------------------ *
+ *  Garantia (fonte única para os 3 lados) — declarada pelo CLIENTE na
+ *  ABERTURA do chamado, por EQUIPAMENTO (cada item tem seu próprio Nº de
+ *  Série, que é o que precisa ser confirmado pelo agente). O cliente só
+ *  pode escolher entre "não possuo" e "solicitar" (que nasce em análise);
+ *  só o agente pode mover para aprovada/recusada — ver allowlist em
+ *  zk_equip_on_ticket_created() e em scp/zk-equip.php.
+ * ------------------------------------------------------------------ */
+function zk_equip_garantias() {
+    return array(
+        'nao_solicitada' => array('label' => 'Não possuo garantia',  'color' => 'var(--zk-tag-gray)'),
+        'em_analise'     => array('label' => 'Garantia em análise',  'color' => 'var(--zk-tag-yellow)'),
+        'aprovada'       => array('label' => 'Garantia aprovada',    'color' => 'var(--zk-tag-green)'),
+        'recusada'       => array('label' => 'Garantia recusada',    'color' => 'var(--zk-tag-red)'),
+    );
+}
+function zk_equip_default_garantia() { return 'nao_solicitada'; }
+function zk_equip_garantia_label($key) {
+    $g = zk_equip_garantias();
+    return isset($g[$key]) ? $g[$key]['label'] : $key;
+}
+function zk_equip_garantia_color($key) {
+    $g = zk_equip_garantias();
+    return isset($g[$key]) ? $g[$key]['color'] : 'var(--zk-tag-gray)';
+}
+/* Allowlist do que o CLIENTE pode enviar na abertura: só 'sim' vira
+   "em_analise" — qualquer outra coisa (ausente, 'nao', lixo) vira o
+   padrão "não solicitada". Nunca aceitar 'aprovada'/'recusada' daqui. */
+function zk_equip_garantia_from_client_input($raw) {
+    return ((string) $raw === 'sim') ? 'em_analise' : zk_equip_default_garantia();
+}
+/* Allowlist do que o AGENTE pode gravar (painel do agente/scp/zk-equip.php). */
+function zk_equip_garantia_staff_options() {
+    return array('em_analise', 'aprovada', 'recusada');
+}
+
 /* Pendências distintas por ticket, para o selo na listagem de Chamados.
    Uma consulta só pra todos os tickets da página (evita N+1). Retorna
    array($ticket_id => array($pendKey => true, ...)). */
@@ -240,6 +276,7 @@ function zk_equip_request_rows() {
             'resumo'       => isset($_POST['zk_resumo'][$i]) ? $_POST['zk_resumo'][$i] : '',
             'detalhamento' => isset($_POST['zk_detalhamento'][$i]) ? $_POST['zk_detalhamento'][$i] : '',
             'photo_key'    => isset($_POST['zk_photo_key'][$i]) ? $_POST['zk_photo_key'][$i] : '',
+            'garantia'     => isset($_POST['zk_garantia'][$i]) ? $_POST['zk_garantia'][$i] : '',
         );
     }
     return $rows;
@@ -542,10 +579,13 @@ function zk_equip_styles() {
 #zk-equip .zk-grid .zk-c-num { width:34px; }
 #zk-equip .zk-grid .zk-c-modelo { width:14%; }
 #zk-equip .zk-grid .zk-c-serie  { width:13%; }
-#zk-equip .zk-grid .zk-c-resumo { width:24%; }
-#zk-equip .zk-grid .zk-c-detal  { width:24%; }
+#zk-equip .zk-grid .zk-c-resumo { width:22%; }
+#zk-equip .zk-grid .zk-c-detal  { width:22%; }
+#zk-equip .zk-grid .zk-c-garantia { width:130px; }
 #zk-equip .zk-grid textarea { width:100%; box-sizing:border-box; padding:7px 8px; border:1px solid #d3d7d1;
   border-radius:5px; font-size:13px; resize:vertical; min-height:34px; font-family:inherit; line-height:1.35; }
+#zk-equip .zk-grid select { width:100%; box-sizing:border-box; padding:6px 6px; border:1px solid #d3d7d1;
+  border-radius:5px; font-size:12.5px; font-family:inherit; background:#fff; color:#474B4F; }
 /* Colunas dos painéis (agente/cliente) */
 /* Miniaturas de fotos: a altura da linha é sempre definida por elas (padrão fixo) */
 .zk-photos { display:flex; flex-wrap:wrap; gap:6px; flex:0 0 auto; }
@@ -631,6 +671,11 @@ function zk_equip_on_ticket_created($ticket, $data = null) {
         $resumo   = isset($r['resumo'])       ? trim((string) $r['resumo'])       : '';
         $detal    = isset($r['detalhamento']) ? trim((string) $r['detalhamento']) : '';
         $photoKey = isset($r['photo_key'])    ? preg_replace('/[^A-Za-z0-9_-]/', '', (string) $r['photo_key']) : '';
+        // ZK: garantia é uma escolha binária do cliente na abertura ("sim"
+        // solicita, qualquer outra coisa não) — allowlist só permite virar
+        // "em_analise" ou o padrão "não solicitada", nunca aprovada/recusada
+        // (isso só o agente grava, depois de conferir o item recebido).
+        $garantia = zk_equip_garantia_from_client_input(isset($r['garantia']) ? $r['garantia'] : '');
         // Revalidação server-side: todos os campos + pelo menos 1 foto são
         // obrigatórios (mesma regra do JS) — linha incompleta é ignorada,
         // mesmo que a requisição tenha contornado a validação do navegador.
@@ -647,6 +692,7 @@ function zk_equip_on_ticket_created($ticket, $data = null) {
              .', detalhamento='.db_input(mb_substr($detal, 0, 200))
              .', status='.db_input(zk_equip_default_status())
              .', pendencia='.db_input(zk_equip_default_pendencia())
+             .', garantia='.db_input($garantia)
              .', created=NOW(), updated=NOW()';
         if (db_query($sql)) {
             $eid = db_insert_id();
@@ -1841,6 +1887,10 @@ function zk_equip_client_process_edit($ticket) {
                  .', resumo='.db_input(mb_substr($resumo, 0, 255))
                  .', detalhamento='.db_input(mb_substr($detal, 0, 200))
                  .', status='.db_input(zk_equip_default_status())
+                 // ZK: equipamento adicionado DEPOIS da abertura (tela de edição)
+                 // não tem campo de garantia — nasce "não solicitada" (a decisão
+                 // de garantia só é oferecida na abertura do chamado).
+                 .', garantia='.db_input(zk_equip_default_garantia())
                  .', created=NOW(), updated=NOW()';
             if (db_query($sql)) {
                 $eid = db_insert_id();
@@ -2416,6 +2466,7 @@ function zk_equipment_client_panel($ticket) {
       <th><?php echo __('Problema relatado'); ?></th>
       <th><?php echo __('Status'); ?></th>
       <th><?php echo __('Pendência'); ?></th>
+      <th><?php echo __('Garantia'); ?></th>
       <th><?php echo __('Laudo técnico'); ?></th>
       <th class="zk-nowrap"><?php echo __('Atualizado'); ?></th>
     </tr></thead>
@@ -2424,7 +2475,8 @@ function zk_equipment_client_panel($ticket) {
         $color = zk_equip_status_color($it['status']);
         $label = zk_equip_status_label($it['status']);
         $itFiles = isset($files[(int)$it['id']]) ? $files[(int)$it['id']] : array();
-        $pendKey = isset($it['pendencia']) ? $it['pendencia'] : ''; ?>
+        $pendKey = isset($it['pendencia']) ? $it['pendencia'] : '';
+        $garKey  = isset($it['garantia']) ? $it['garantia'] : zk_equip_default_garantia(); ?>
       <tr class="zk-row">
         <td class="zk-c-num"><?php echo (int) $it['seq']; ?></td>
         <td>
@@ -2444,6 +2496,7 @@ function zk_equipment_client_panel($ticket) {
         <td><?php echo $pendKey !== ''
             ? '<span class="zk-badge zk-badge-pend" style="--badge-c:'.zk_equip_pendencia_color($pendKey).'">'.Format::htmlchars(zk_equip_pendencia_label($pendKey)).'</span>'
             : '<span class="zk-muted">—</span>'; ?></td>
+        <td><span class="zk-badge" style="--badge-c:<?php echo zk_equip_garantia_color($garKey); ?>"><?php echo Format::htmlchars(zk_equip_garantia_label($garKey)); ?></span></td>
         <td><?php echo ($it['laudo'] !== null && $it['laudo'] !== '') ? nl2br(Format::htmlchars($it['laudo'])) : '<span class="zk-muted">—</span>'; ?></td>
         <td class="zk-nowrap zk-muted"><?php echo Format::datetime($it['updated']); ?></td>
       </tr>
@@ -2561,6 +2614,7 @@ function zk_equipment_staff_panel($ticket) {
         <th><?php echo __('Equipamento'); ?></th>
         <th><?php echo __('Problema relatado'); ?></th>
         <th><?php echo __('Status'); ?></th>
+        <th><?php echo __('Garantia'); ?></th>
         <th><?php echo __('Laudo (visível ao cliente)'); ?></th>
         <th><?php echo __('Nota interna'); ?></th>
       </tr></thead>
@@ -2596,6 +2650,19 @@ function zk_equipment_staff_panel($ticket) {
                      atualiza ao vivo pelo JS ao trocar o status. */
                   $__w = zk_equip_status_weight($it['status']); ?>
             <div class="zk-eqp-mini" title="<?php echo $__w; ?>%"><span style="width:<?php echo $__w; ?>%;background:<?php echo zk_equip_status_color($it['status']); ?>"></span></div>
+          </td>
+          <td>
+            <?php $__gar = isset($it['garantia']) ? $it['garantia'] : zk_equip_default_garantia();
+            if ($__gar === 'nao_solicitada') { ?>
+            <span class="zk-muted"><?php echo __('Não possuo garantia'); ?></span>
+            <?php } else { ?>
+            <select name="garantia[<?php echo $id; ?>]" class="zk-garantia-sel"
+                title="<?php echo __('Confira o Nº de Série do equipamento recebido antes de aprovar.'); ?>">
+              <?php foreach (zk_equip_garantia_staff_options() as $k) { ?>
+              <option value="<?php echo $k; ?>"<?php echo ($k === $__gar) ? ' selected' : ''; ?>><?php echo Format::htmlchars(zk_equip_garantia_label($k)); ?></option>
+              <?php } ?>
+            </select>
+            <?php } ?>
           </td>
           <td><textarea name="laudo[<?php echo $id; ?>]" rows="2" class="zk-laudo" placeholder="<?php echo __('Laudo / parecer técnico...'); ?>"><?php echo Format::htmlchars($it['laudo']); ?></textarea></td>
           <td><textarea name="nota[<?php echo $id; ?>]" rows="2" class="zk-nota" placeholder="<?php echo __('Uso interno...'); ?>"><?php echo Format::htmlchars($it['nota_interna']); ?></textarea></td>

@@ -71,4 +71,12 @@ if (isset($_SESSION['::sysmsgs'])) {
 if (@file_exists(INCLUDE_DIR.'zk_equipment.php'))
     require_once(INCLUDE_DIR.'zk_equipment.php');
 /* ZK-EQUIP:END */
+
+/* ZK-SEC:BEGIN — CAPTCHA Cloudflare Turnstile, carregado sempre (mesmo
+   esquema do zk_equipment.php acima) para que include/client/header.inc.php
+   possa checar Turnstile::isConfigured() em toda página do cliente, não só
+   nas que explicitamente exigem o CAPTCHA. */
+if (@file_exists(INCLUDE_DIR.'class.turnstile.php'))
+    require_once(INCLUDE_DIR.'class.turnstile.php');
+/* ZK-SEC:END */
 ?>

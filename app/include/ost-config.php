@@ -136,7 +136,11 @@ define('TABLE_PREFIX','ost_');
 # http://en.wikipedia.org/wiki/X-Forwarded-For
 #
 
-define('TRUSTED_PROXIES', '');
+# ZK/Docker: em produção atrás do Cloudflare, preencher via OST_TRUSTED_PROXIES
+# no .env com os ranges oficiais de IP do Cloudflare (cloudflare.com/ips) —
+# sem isso, get_client_ip()/get_client_port() ignoram X-Forwarded-For/-Proto
+# e usam o IP do proxy em vez do do visitante. Vazio por padrão (dev local).
+define('TRUSTED_PROXIES', getenv('OST_TRUSTED_PROXIES') ?: '');
 
 
 # Option: LOCAL_NETWORKS (default: 127.0.0.0/24)
@@ -147,6 +151,16 @@ define('TRUSTED_PROXIES', '');
 # define comma separated IP addreseses or enter CIDR of local network.
 
 define('LOCAL_NETWORKS', '127.0.0.0/24');
+
+#
+# Cloudflare Turnstile (CAPTCHA)
+# ===================================================
+# ZK: chaves do widget Turnstile criado no painel Cloudflare (Turnstile ->
+# Add Widget). Lidas do ambiente (.env -> OST_TURNSTILE_SITE_KEY/_SECRET_KEY)
+# — nunca fixas aqui. Enquanto vazias, o CAPTCHA fica desligado (dev local
+# sem bloquear ninguém) — ver include/class.turnstile.php.
+define('TURNSTILE_SITE_KEY', getenv('OST_TURNSTILE_SITE_KEY') ?: '');
+define('TURNSTILE_SECRET_KEY', getenv('OST_TURNSTILE_SECRET_KEY') ?: '');
 
 #
 # Session Options

@@ -63,6 +63,14 @@ class Bootstrap {
 
         if (!isset($_SERVER['REMOTE_ADDR']))
             $_SERVER['REMOTE_ADDR'] = '';
+
+        // ZK-SEC: cookie de sessão só marcado "Secure" quando a requisição
+        // realmente chegou como HTTPS (direto ou via X-Forwarded-Proto de um
+        // proxy confiável — ver is_https()). Setado aqui, ANTES do
+        // session_start() em osTicket::start(), e não fixo no php.ini porque
+        // o mesmo ambiente também é usado em HTTP puro (dev local).
+        if (osTicket::is_https())
+            ini_set('session.cookie_secure', 1);
     }
 
     static function https() {

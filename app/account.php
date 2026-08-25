@@ -16,7 +16,7 @@
     vim: expandtab sw=4 ts=4 sts=4:
     $Id: $
 **********************************************************************/
-require 'client.inc.php';
+require 'client.inc.php'; // já carrega class.turnstile.php via main.inc.php
 
 $inc = 'register.inc.php';
 
@@ -60,7 +60,13 @@ elseif ($_POST) {
         $_POST['email'] = $thisclient->getEmail();
     }
 
-    if (!$user_form->isValid(function($f) { return $f->isVisibleToUsers(); }))
+    // ZK-SEC: CAPTCHA Cloudflare Turnstile — este é o formulário público real
+    // (sem login) hoje, então é aqui que o anti-spam de fato importa. Sem
+    // chaves configuradas (dev/local), Turnstile::verify() não bloqueia.
+    if (Turnstile::isConfigured()
+            && !Turnstile::verify($_POST['cf-turnstile-response'] ?? null))
+        $errors['err'] = __('Verificação de segurança falhou. Atualize a página e tente novamente.');
+    elseif (!$user_form->isValid(function($f) { return $f->isVisibleToUsers(); }))
         $errors['err'] = __('Incomplete client information');
     elseif (!$_POST['backend'] && !$_POST['passwd1'])
         $errors['passwd1'] = __('New password is required');

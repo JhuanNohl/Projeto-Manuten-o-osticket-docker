@@ -139,6 +139,7 @@ if ($info['topicId'] && ($topic=Topic::lookup($info['topicId']))) {
                 <th class="zk-c-serie"><?php echo __('Nº de Série'); ?> <span class="required">*</span></th>
                 <th class="zk-c-resumo"><?php echo __('Falha Apresentada'); ?> <span class="required">*</span> <span id="zk-resumo-head-count" class="zk-th-count">0/32</span></th>
                 <th class="zk-c-detal"><?php echo __('Observação'); ?> <span class="required">*</span> <span id="zk-detal-head-count" class="zk-th-count">0/200</span></th>
+                <th class="zk-c-garantia"><?php echo __('Garantia'); ?></th>
                 <th class="zk-c-photos"><?php echo __('Fotos'); ?> <span class="required">*</span></th>
                 <th class="zk-c-del"></th>
               </tr>
@@ -174,17 +175,16 @@ if ($info['topicId'] && ($topic=Topic::lookup($info['topicId']))) {
     </tbody>
     <tbody>
     <?php
-    if($cfg && $cfg->isCaptchaEnabled() && (!$thisclient || !$thisclient->isValid())) {
+    // ZK-SEC: CAPTCHA Cloudflare Turnstile no lugar do CAPTCHA de imagem
+    // legado do core (class.captcha.php/captcha.php, sem uso a partir daqui).
+    if (Turnstile::isConfigured() && (!$thisclient || !$thisclient->isValid())) {
         if($_POST && $errors && !$errors['captcha'])
             $errors['captcha']=__('Please re-enter the text again');
         ?>
     <tr class="captchaRow">
         <td class="required"><?php echo __('CAPTCHA Text');?>:</td>
         <td>
-            <span class="captcha"><img src="captcha.php" border="0" align="left"></span>
-            &nbsp;&nbsp;
-            <input id="captcha" type="text" name="captcha" size="6" autocomplete="off">
-            <em><?php echo __('Enter the text shown on the image.');?></em>
+            <?php echo Turnstile::render(); ?>
             <font class="error">*&nbsp;<?php echo $errors['captcha']; ?></font>
         </td>
     </tr>
@@ -246,6 +246,10 @@ if ($info['topicId'] && ($topic=Topic::lookup($info['topicId']))) {
         + '<td class="zk-c-serie"><input type="text" name="zk_serie[]" class="zk-serie" value="'+v(d.serie)+'" maxlength="120"></td>'
         + '<td class="zk-c-resumo"><input type="text" name="zk_resumo[]" class="zk-resumo" value="'+v(d.resumo)+'" maxlength="'+RESUMO_LIMIT+'"></td>'
         + '<td class="zk-c-detal"><textarea name="zk_detalhamento[]" class="zk-detal" rows="1" maxlength="'+DETAL_LIMIT+'">'+t(d.detalhamento)+'</textarea></td>'
+        + '<td class="zk-c-garantia"><select name="zk_garantia[]" class="zk-garantia">'
+        + '<option value="nao"'+(d.garantia==='sim'?'':' selected')+'>'+'<?php echo __('Não possuo garantia'); ?>'+'</option>'
+        + '<option value="sim"'+(d.garantia==='sim'?' selected':'')+'>'+'<?php echo __('Solicitar garantia'); ?>'+'</option>'
+        + '</select></td>'
         + '<td class="zk-c-photos"><div class="zk-photo-pair">'
         + '<label class="zk-photo-btn" title="Anexar foto(s) — até '+MAX_PHOTOS+'"><i class="icon-paperclip"></i><input type="file" name="zk_equip_photo['+photoKey+'][]" accept="image/*" multiple class="zk-photo-input"></label>'
         + '</div><div class="zk-photo-count">0/'+MAX_PHOTOS+'</div></td>'
@@ -349,6 +353,7 @@ if ($info['topicId'] && ($topic=Topic::lookup($info['topicId']))) {
           serie:        $.trim($r.find('.zk-serie').val()||''),
           resumo:       $.trim($r.find('.zk-resumo').val()||''),
           detalhamento: $.trim($r.find('.zk-detal').val()||''),
+          garantia:     $r.find('.zk-garantia').val()||'nao',
           photo_key:    $r.data('photo-key') || ''
         };
         if (o.modelo!=='' || o.serie!=='') arr.push(o);

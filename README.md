@@ -294,6 +294,16 @@ do site institucional).
    }
    ```
    (Traefik/Caddy fazem o certificado automaticamente — mais simples.)
+
+   **Alternativa usada no piloto público:** colocar o domínio atrás do
+   **Cloudflare** (proxy laranja ligado) em vez de um reverso próprio — o
+   Cloudflare já termina o TLS na borda (modo SSL/TLS **"Full"** ou
+   **"Full (strict)"**, nunca "Flexible" com HTTPS forçado, senão vira loop
+   de redirecionamento) e ainda entrega o Turnstile (item 8) e o WAF/anti-DDoS
+   gratuitos. Nesse caso o container continua recebendo HTTP puro na porta
+   8080 (como hoje), mas com os cabeçalhos `X-Forwarded-Proto`/`X-Forwarded-For`
+   do Cloudflare — é exatamente para isso que servem `TRUSTED_PROXIES` e o
+   `force_https` do item 8.
 3. **Helpdesk URL:** ajuste para `https://suporte.zkteco.com.br/` no painel admin.
 4. **Ambientes separados:** use arquivos `.env` diferentes e, se quiser, arquivos
    compose por ambiente:
@@ -311,6 +321,23 @@ do site institucional).
    do Windows) ou um cron no servidor, e leve os `.sql` para fora da máquina.
 7. **Boas práticas:** senhas fortes; remover `setup/` (já removido nesta cópia);
    manter Docker/imagens atualizados; **testar upgrades sempre em homologação**.
+8. **CAPTCHA (Cloudflare Turnstile) + IP real atrás de proxy:**
+   1. Crie um widget em <https://dash.cloudflare.com/> → **Turnstile** → *Add
+      Widget* e copie a **Site Key** e a **Secret Key**.
+   2. No `.env` de produção, preencha `TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET_KEY`
+      (vazio = CAPTCHA desligado — é assim que o dev local continua livre).
+   3. Preencha `TRUSTED_PROXIES` com os ranges oficiais de IP do Cloudflare
+      (IPv4 + IPv6, lista em <https://www.cloudflare.com/ips/>) — sem isso, o
+      IP do visitante nos logs/rate-limit vira o IP do próprio Cloudflare.
+   4. `docker compose up -d --build` (o Dockerfile passou a instalar a
+      extensão `curl`, usada para validar o token do Turnstile).
+   5. Em *Painel Admin → Configurações → Sistema*, marque **"Force HTTPS"**
+      (`force_https`) — o core já detecta HTTPS via `X-Forwarded-Proto`, sem
+      precisar de certificado dentro do container.
+9. **SQL Injection:** o código customizado (`zk_equipment.php` e módulos
+   ligados a ele) foi auditado — todo valor dinâmico passa por `db_input()`
+   antes de qualquer `db_query()`. Ao adicionar SQL novo no projeto, siga o
+   mesmo padrão (nunca concatenar `$_POST`/`$_GET` direto na query).
 
 ---
 

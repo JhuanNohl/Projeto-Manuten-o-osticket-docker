@@ -106,6 +106,9 @@ $info = Format::htmlchars(($errors && $_POST)?$_POST:$info);
   </div>
 </div>
 <hr>
+<?php /* ZK-SEC: CAPTCHA Cloudflare Turnstile — sem chaves configuradas
+         (TURNSTILE_SITE_KEY/_SECRET_KEY vazias), render() não desenha nada. */
+echo Turnstile::render(); ?>
 <p class="buttons">
     <input type="submit" value="<?php echo __('Register'); ?>"/>
     <input type="button" value="<?php echo __('Cancel'); ?>" onclick="javascript:

@@ -58,8 +58,10 @@ if (!empty($_POST['zk_ticket_nf_verify'])) {
 
 $valid      = zk_equip_statuses();
 $validPend  = zk_equip_pendencias();
+$validGar   = array_flip(zk_equip_garantia_staff_options()); // allowlist: só em_analise/aprovada/recusada
 $statuses   = (isset($_POST['status'])    && is_array($_POST['status']))    ? $_POST['status']    : array();
 $pendencias = (isset($_POST['pendencia']) && is_array($_POST['pendencia'])) ? $_POST['pendencia'] : array();
+$garantias  = (isset($_POST['garantia'])  && is_array($_POST['garantia']))  ? $_POST['garantia']  : array();
 $laudos     = (isset($_POST['laudo'])     && is_array($_POST['laudo']))     ? $_POST['laudo']     : array();
 $notas      = (isset($_POST['nota'])      && is_array($_POST['nota']))      ? $_POST['nota']      : array();
 
@@ -74,13 +76,14 @@ foreach ($statuses as $id => $newStatus) {
 
     // Carrega o item garantindo que pertence a ESTE ticket (status e
     // laudo atuais servem pra detectar o que de fato mudou).
-    $res = db_query('SELECT id, status, laudo, modelo, numero_serie FROM '.zk_equip_table()
+    $res = db_query('SELECT id, status, laudo, garantia, modelo, numero_serie FROM '.zk_equip_table()
                    .' WHERE id='.db_input($id).' AND ticket_id='.db_input($tid));
     if (!$res || !($cur = db_fetch_array($res)))
         continue;
 
-    $oldStatus = $cur['status'];
-    $oldLaudo  = trim((string) $cur['laudo']);
+    $oldStatus   = $cur['status'];
+    $oldLaudo    = trim((string) $cur['laudo']);
+    $oldGarantia = $cur['garantia'];
     $laudo = isset($laudos[$id]) ? trim((string) $laudos[$id]) : '';
     $nota  = isset($notas[$id])  ? trim((string) $notas[$id])  : '';
     $rotulo = trim((string) $cur['modelo'])
@@ -93,9 +96,19 @@ foreach ($statuses as $id => $newStatus) {
     if ($newPend !== null && ($newPend === '' || isset($validPend[$newPend])))
         $pendSql = ', pendencia='.db_input($newPend);
 
+    // Garantia: só é ajustável pelo agente se o CLIENTE de fato pediu
+    // (nunca sai de "não solicitada" por aqui — a única porta pra isso é o
+    // próprio cliente na abertura do chamado). Allowlist restrita a
+    // em_analise/aprovada/recusada.
+    $newGarantia = isset($garantias[$id]) ? (string) $garantias[$id] : null;
+    $garSql = '';
+    if ($newGarantia !== null && $oldGarantia !== 'nao_solicitada' && isset($validGar[$newGarantia]))
+        $garSql = ', garantia='.db_input($newGarantia);
+
     db_query('UPDATE '.zk_equip_table().' SET '
             .'  status='.db_input($newStatus)
             . $pendSql
+            . $garSql
             .', laudo='.db_input(mb_substr($laudo, 0, 4000))
             .', nota_interna='.db_input(mb_substr($nota, 0, 4000))
             .', staff_id='.db_input($sid)
@@ -113,6 +126,12 @@ foreach ($statuses as $id => $newStatus) {
                 .', created=NOW()');
         $mudancas[] = '<b>'.Format::htmlchars($rotulo).'</b>: status atualizado para <b>'
             .Format::htmlchars(zk_equip_status_label($newStatus)).'</b>';
+    }
+
+    // Garantia decidida (aprovada/recusada) -> avisa o cliente na hora.
+    if ($garSql !== '' && $newGarantia !== $oldGarantia) {
+        $mudancas[] = '<b>'.Format::htmlchars($rotulo).'</b>: garantia atualizada para <b>'
+            .Format::htmlchars(zk_equip_garantia_label($newGarantia)).'</b>';
     }
 
     // Laudo técnico alterado -> entra na história com o texto completo
