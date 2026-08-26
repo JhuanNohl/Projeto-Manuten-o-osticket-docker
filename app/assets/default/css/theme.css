@@ -1939,6 +1939,99 @@ a:hover, .link:hover{ color:var(--zk-green); border-bottom:1px dotted var(--zk-g
 #ticketForm input[type=radio]{ width:auto; display:inline-block; margin-right:6px; }
 #ticketForm label.inline{ display:inline-block; font-weight:400; margin:0 10px 0 0; }
 
+/* ZK-TERMS: resumo sempre visível (garantia/valores/armazenagem) ANTES
+   do aceite — pedido explícito pra evidenciar isso sem depender do
+   cliente abrir o termo completo. */
+.zk-terms-highlights{
+  margin:16px 0 0; padding:14px 16px;
+  background:#fbf8ee; border:1px solid #ecdfae; border-left:4px solid #d9a441;
+  border-radius:8px;
+}
+.zk-terms-highlights h4{
+  margin:0 0 8px; font-size:13px; font-weight:700; color:var(--zk-graphite,#2b3630);
+}
+.zk-terms-highlights ul{ margin:0; padding-left:18px; }
+.zk-terms-highlights li{
+  font-size:12.5px; line-height:1.5; color:#555; margin-bottom:5px;
+}
+.zk-terms-highlights li strong{ color:var(--zk-graphite,#2b3630); }
+
+/* ZK-TERMS: aceite obrigatório do Termo de Garantia e Política de
+   Manutenção (registro de conta) — caixa destacada, vira vermelho suave
+   se o cliente tentar enviar sem marcar. */
+.zk-terms-box{
+  margin:16px 0; padding:14px 16px;
+  background:#f7f9f6; border:1px solid var(--zk-line); border-radius:8px;
+}
+.zk-terms-box.zk-terms-error{
+  background:#fdf2f1; border-color:#e0a8a3;
+}
+.zk-terms-box .zk-terms-label{
+  display:flex; align-items:flex-start; gap:10px;
+  font-size:13px; line-height:1.5; color:var(--zk-text-soft,#555);
+  font-weight:400; cursor:pointer;
+}
+.zk-terms-box input[type=checkbox]{ margin-top:3px; flex:0 0 auto; }
+.zk-terms-box input[type=checkbox]:disabled{ cursor:not-allowed; }
+.zk-terms-box a{ color:var(--zk-green); font-weight:600; }
+.zk-terms-box .error{ display:block; margin-top:6px; }
+
+/* ZK-TERMS: modal de leitura obrigatória do termo completo — precisa
+   rolar até o fim pra habilitar o botão de aceite, que é o único jeito
+   (com JS ligado) de destravar o checkbox principal. */
+.zk-terms-modal-overlay{
+  position:fixed; inset:0; z-index:9999;
+  background:rgba(20,26,22,.55);
+  display:flex; align-items:center; justify-content:center;
+  padding:24px;
+}
+/* Sem isto, o [hidden] nativo do navegador perde pra esta classe (mesma
+   especificidade, esta carrega depois) e o overlay fica sempre visível
+   e clicável por cima da página — achado em teste com browser real. */
+.zk-terms-modal-overlay[hidden]{ display:none; }
+.zk-terms-modal{
+  background:#fff; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.28);
+  width:100%; max-width:680px; max-height:min(85vh, 760px);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.zk-terms-modal-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px; border-bottom:1px solid var(--zk-line);
+  flex:0 0 auto;
+}
+.zk-terms-modal-header h3{
+  margin:0; font-size:15px; color:var(--zk-graphite,#2b3630);
+}
+.zk-terms-modal-close{
+  border:0; background:transparent; font-size:22px; line-height:1;
+  color:#888; cursor:pointer; padding:2px 6px; border-radius:6px;
+}
+.zk-terms-modal-close:hover{ background:var(--zk-line); color:#333; }
+.zk-terms-modal-body{
+  flex:1 1 auto; overflow-y:auto; padding:8px 24px;
+}
+.zk-terms-modal-body .zk-doc{ max-width:none; padding:16px 0 8px; }
+.zk-terms-modal-body .zk-doc-header{ padding-bottom:12px; margin-bottom:18px; }
+.zk-terms-modal-body .zk-doc-header h1{ font-size:17px; }
+.zk-terms-modal-footer{
+  flex:0 0 auto; padding:14px 20px; border-top:1px solid var(--zk-line);
+  background:#fafbf9; display:flex; align-items:center; justify-content:space-between;
+  gap:14px; flex-wrap:wrap;
+}
+.zk-terms-modal-hint{ margin:0; font-size:12px; color:#777; }
+.zk-terms-modal-accept{
+  flex:0 0 auto; border:0; border-radius:6px; padding:9px 18px;
+  font-size:13px; font-weight:600; color:#fff; cursor:pointer;
+  background:linear-gradient(180deg, var(--zk-green), #6bab39);
+}
+.zk-terms-modal-accept:disabled{
+  background:#c7cfc2; cursor:not-allowed;
+}
+@media (max-width:560px){
+  .zk-terms-modal-overlay{ padding:0; }
+  .zk-terms-modal{ max-width:100%; max-height:100vh; border-radius:0; }
+}
+
 /* ------- Barra de ações: <hr> final + botões, alinhados à esquerda. --
    Regras compartilhadas com #zkEditForm (edição de equipamentos) e #reply
    (responder chamado) — nenhum dos dois é o #ticketForm nativo, mas

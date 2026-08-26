@@ -66,6 +66,10 @@ elseif ($_POST) {
     if (Turnstile::isConfigured()
             && !Turnstile::verify($_POST['cf-turnstile-response'] ?? null))
         $errors['err'] = __('Verificação de segurança falhou. Atualize a página e tente novamente.');
+    // ZK-TERMS: aceite obrigatório das Políticas de Manutenção no primeiro
+    // acesso — sem isso não é possível criar a conta.
+    elseif (empty($_POST['zk_terms_accept']))
+        $errors['zk_terms'] = __('É necessário confirmar a leitura e concordância com as Políticas de Manutenção para criar sua conta.');
     elseif (!$user_form->isValid(function($f) { return $f->isVisibleToUsers(); }))
         $errors['err'] = __('Incomplete client information');
     elseif (!$_POST['backend'] && !$_POST['passwd1'])
@@ -114,6 +118,22 @@ elseif ($_POST) {
     }
 
     if (!$errors) {
+        // ZK-TERMS: prova auditável do aceite (quem, quando, IP/user-agent,
+        // se rolou o termo até o fim no modal) — ver
+        // db/migrations/005-aceite-politicas-manutencao.sql e
+        // db/migrations/006-scroll-confirmado-termo.sql
+        db_query(sprintf(
+            "INSERT INTO ost_zk_terms_acceptance
+                (user_id, email, documents, scrolled_confirmed, ip_address, user_agent, accepted_at)
+             VALUES (%d, %s, %s, %d, %s, %s, NOW())",
+            $user->getId(),
+            db_input($user->getEmail()),
+            db_input('termo-manutencao-zkteco.php'),
+            !empty($_POST['zk_terms_scrolled']) ? 1 : 0,
+            db_input($_SERVER['REMOTE_ADDR'] ?? ''),
+            db_input(substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255))
+        ));
+
         switch ($_POST['do']) {
         case 'create':
             $content = Page::lookupByType('registration-confirm');
