@@ -36,7 +36,7 @@ if ($content) {
             <span><?php echo __('Converse com a equipe técnica e receba atualizações por e-mail.'); ?></span></li>
       </ul>
       <p class="zk-login-trust"><i class="icon-shield"></i>
-         <?php echo __('Acesso restrito e seguro!'); ?></p>
+         <?php echo __('Acesso Restrito e Seguro!'); ?></p>
     </div>
   </section>
   <section class="zk-login-side">

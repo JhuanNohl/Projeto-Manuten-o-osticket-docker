@@ -498,7 +498,7 @@ $(function(){
         $__phone = $ticket->getPhoneNumber();
         if ($__phone) { /* ZK: Telefone/WhatsApp de volta ao cabeçalho como link clicável do WhatsApp (Docker, 2026-07-07) */ ?>
                 <tr>
-                    <th><?php echo __('Telefone/WhatsApp'); ?>:</th>
+                    <th><?php echo __('Telefone'); ?>:</th>
                     <td>
                         <?php if (function_exists('zk_whatsapp_url')) { ?>
                         <a class="no-pjax" target="_blank" href="<?php echo Format::htmlchars(zk_whatsapp_url($__phone)); ?>"

@@ -115,7 +115,7 @@ $__stColor = isset($__stateColors[$__stState]) ? $__stateColors[$__stState] : '#
                     <span class="zk-ti-value"><?php echo Format::htmlchars($ticket->getEmail()); ?></span>
                 </div>
                 <div class="zk-ti-row">
-                    <span class="zk-ti-label"><?php echo __('Telefone/WhatsApp');?></span>
+                    <span class="zk-ti-label"><?php echo __('Telefone');?></span>
                     <span class="zk-ti-value"><?php
                     /* ZK-EQUIP: número vira link direto pro WhatsApp (conveniência
                        tanto pro cliente reconferir quanto, no espelho desta mesma

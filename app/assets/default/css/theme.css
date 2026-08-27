@@ -1966,6 +1966,116 @@ a:hover, .link:hover{ color:var(--zk-green); border-bottom:1px dotted var(--zk-g
 .zk-terms-box.zk-terms-error{
   background:#fdf2f1; border-color:#e0a8a3;
 }
+/* ZK-TERMS: aviso rápido (não é erro) quando o cliente tenta marcar
+   "aceito" sem abrir o termo antes — pisca vermelho suave pra guiar
+   o clique até o link, sem travar a caixa no estado de erro. */
+.zk-terms-box.zk-terms-flash{
+  animation: zk-terms-pulse .9s ease;
+}
+.zk-terms-box.zk-terms-flash .zk-terms-link{
+  animation: zk-terms-pulse-text .9s ease;
+}
+@keyframes zk-terms-pulse{
+  0%, 100%{ background:#f7f9f6; border-color:var(--zk-line); }
+  25%{ background:#fdeceb; border-color:#e0a8a3; }
+}
+@keyframes zk-terms-pulse-text{
+  0%, 100%{ color:var(--zk-green); }
+  25%{ color:#c0392b; }
+}
+
+/* ===================================================================
+   ZK-DATEPICKER: calendário do campo "Data de Nascimento" no padrão
+   verde/branco da ZKTeco, inspirado no seletor de data do Material
+   Design do Google (cartão arredondado, painel verde com a data por
+   extenso no topo, dias em círculo, rodapé Limpar/Cancelar/Definir).
+   É o mesmo widget jQuery UI datepicker (#ui-datepicker-div) já
+   retemado em scp/css/zkteco-scp.css pro painel do agente — aqui é a
+   versão do portal do cliente (JS de montagem em register.inc.php e
+   profile.inc.php, que só reconfigura o widget já renderizado pelo
+   core, sem tocar em class.forms.php). ================================ */
+#ui-datepicker-div.ui-datepicker{
+  width:280px; padding:0; border:0; border-radius:14px; overflow:hidden;
+  background:#fff; box-shadow:0 20px 50px -12px rgba(0,0,0,.35); font-family:inherit;
+}
+/* painel verde: ano + data por extenso, atualizado via JS ao navegar/escolher */
+.zk-dp-hero{
+  background:linear-gradient(135deg, var(--zk-green), #649E37);
+  color:#fff; padding:16px 20px 18px;
+}
+.zk-dp-hero small{ display:block; font-size:12px; font-weight:600; letter-spacing:.02em; opacity:.85; }
+.zk-dp-hero strong{ display:block; font-size:21px; font-weight:700; line-height:1.2; margin-top:4px; }
+/* cabeçalho branco (mês/ano + navegação), abaixo do painel verde */
+#ui-datepicker-div .ui-datepicker-header{
+  background:#fff; border:0; border-bottom:1px solid var(--zk-line); padding:10px 8px;
+}
+#ui-datepicker-div .ui-datepicker-title{ color:var(--zk-graphite,#474B4F); font-weight:700; font-size:13px; }
+#ui-datepicker-div .ui-datepicker-prev, #ui-datepicker-div .ui-datepicker-next{
+  cursor:pointer; top:8px; border:0 !important; background:transparent !important;
+  width:26px; height:26px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+}
+#ui-datepicker-div .ui-datepicker-prev{ left:8px; }
+#ui-datepicker-div .ui-datepicker-next{ right:8px; }
+#ui-datepicker-div .ui-datepicker-prev:hover, #ui-datepicker-div .ui-datepicker-next:hover{
+  background:#eef7e6 !important;
+}
+/* setas desenhadas em CSS — mais confiável que reaproveitar/recolorir
+   o sprite padrão do tema jQuery UI (ui-lightness) */
+#ui-datepicker-div .ui-datepicker-prev span, #ui-datepicker-div .ui-datepicker-next span{
+  display:none;
+}
+#ui-datepicker-div .ui-datepicker-prev::before,
+#ui-datepicker-div .ui-datepicker-next::before{
+  font-size:19px; font-weight:700; color:#649E37; line-height:1;
+}
+#ui-datepicker-div .ui-datepicker-prev::before{ content:'\2039'; }
+#ui-datepicker-div .ui-datepicker-next::before{ content:'\203A'; }
+/* só 1 mês por vez (core define numberOfMonths:2 pra todo campo de
+   data; sobrescrito via JS pra 1, mas a regra abaixo é rede de
+   segurança visual caso o segundo mês apareça por qualquer motivo) */
+#ui-datepicker-div .ui-datepicker-group + .ui-datepicker-group{ display:none; }
+#ui-datepicker-div .ui-datepicker-calendar{ margin:6px 10px 4px; width:calc(100% - 20px); font-size:12.5px; }
+#ui-datepicker-div .ui-datepicker-calendar th{ color:#8a8f8a; font-weight:600; padding:6px 0; }
+#ui-datepicker-div .ui-datepicker-calendar td{ padding:2px; text-align:center; }
+/* dias em círculo — hoje com contorno verde, selecionado preenchido */
+#ui-datepicker-div .ui-datepicker-calendar td a,
+#ui-datepicker-div .ui-datepicker-calendar td span{
+  display:flex; align-items:center; justify-content:center;
+  width:30px; height:30px; line-height:30px; margin:0 auto;
+  border:0 !important; background:transparent !important; border-radius:50%;
+  color:#3c4440 !important;
+}
+#ui-datepicker-div .ui-datepicker-calendar td a:hover{ background:#eef7e6 !important; color:#649E37 !important; }
+#ui-datepicker-div .ui-datepicker-today a{
+  box-shadow:inset 0 0 0 1.5px var(--zk-green); font-weight:700; color:#649E37 !important;
+}
+#ui-datepicker-div .ui-state-active,
+#ui-datepicker-div .ui-datepicker-current-day a{
+  background:var(--zk-green) !important; color:#fff !important; font-weight:700; box-shadow:none;
+}
+#ui-datepicker-div .ui-datepicker-other-month a{ color:#c3c9c1 !important; }
+/* rodapé: Limpar (esquerda) / Cancelar / Definir (direita) — montado via
+   JS (zkDpEnsureButtons); os botões nativos "Today/Done" ficam ocultos */
+#ui-datepicker-div .ui-datepicker-buttonpane{
+  margin:0; padding:6px 10px; border-top:1px solid var(--zk-line); background:#fafcf8;
+}
+#ui-datepicker-div .ui-datepicker-buttonpane button.ui-datepicker-current,
+#ui-datepicker-div .ui-datepicker-buttonpane button.ui-datepicker-close{
+  display:none;
+}
+.zk-dp-buttons{ display:flex; align-items:center; }
+.zk-dp-buttons button{
+  border:0; background:transparent; cursor:pointer; border-radius:6px;
+  padding:8px 12px; font-size:12px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
+}
+.zk-dp-buttons .zk-dp-clear{ color:#8a8f8a; margin-right:auto; }
+.zk-dp-buttons .zk-dp-clear:hover{ background:#f1f2f0; color:#5a5f5a; }
+.zk-dp-buttons .zk-dp-cancel{ color:#649E37; }
+.zk-dp-buttons .zk-dp-cancel:hover{ background:#eef7e6; }
+.zk-dp-buttons .zk-dp-ok{ color:#649E37; }
+.zk-dp-buttons .zk-dp-ok:hover{ background:#eef7e6; }
+
 .zk-terms-box .zk-terms-label{
   display:flex; align-items:flex-start; gap:10px;
   font-size:13px; line-height:1.5; color:var(--zk-text-soft,#555);
