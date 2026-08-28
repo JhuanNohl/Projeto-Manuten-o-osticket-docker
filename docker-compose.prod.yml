@@ -1,63 +1,33 @@
 # ============================================================================
-#  Override de PRODUÇÃO — Nginx (proxy reverso + TLS) e Certbot (Let's Encrypt)
+#  Override de PRODUÇÃO — publica o helpdesk através do Traefik compartilhado
+#  do servidor (proxy reverso único do host, ocupa sozinho as portas 80/443
+#  e cuida de HTTPS/Let's Encrypt automaticamente). Ver
+#  traefik-onboarding-devs.md para o guia geral de qualquer app no servidor.
 #
 #  Uso:
 #    docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 #
-#  Este servidor já hospeda outras coisas nas portas 80/443 — por isso o
-#  helpdesk usa a porta 4040 (https://<domínio>:4040) e o certificado é
-#  emitido por desafio DNS-01 (não precisa da porta 80 aberta). Ver
-#  scripts/init-letsencrypt.sh e README, seção 11.
-#
-#  Pré-requisitos no servidor:
-#    - DNS de ${DOMAIN} (ver .env) já apontando para o IP público deste host.
-#    - Porta 4040 liberada no firewall (TCP, entrada).
-#    - Rodar scripts/init-letsencrypt.sh UMA VEZ antes deste comando, para
-#      emitir o certificado inicial (ver README, seção 11).
-#
-#  O container "app" continua ouvindo em ${APP_PORT} só em 127.0.0.1 (não
-#  fica exposto direto na internet) — quem atende o público é o Nginx, na
-#  porta 4040, fazendo proxy_pass para "app" pela rede interna do Docker.
+#  O container "app" não publica NENHUMA porta no host — quem recebe o
+#  tráfego externo é o Traefik, que encaminha para "app" pela rede Docker
+#  "traefik-public" usando as labels abaixo (sem elas, o Traefik ignora o
+#  container).
 # ============================================================================
 
 services:
   app:
-    ports:
-      - "127.0.0.1:${APP_PORT}:80"
-
-  nginx:
-    image: nginx:1.27-alpine
-    container_name: osticket-nginx
-    restart: unless-stopped
-    depends_on:
-      - app
-    environment:
-      DOMAIN: ${DOMAIN}
-    volumes:
-      - ./docker/nginx/app.conf.template:/etc/nginx/templates/app.conf.template:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-    ports:
-      - "4040:443"
-    # Gera conf.d/default.conf a partir do template (só substitui $DOMAIN) e
-    # sobe o Nginx.
-    command: >
-      sh -c "envsubst '$$DOMAIN' < /etc/nginx/templates/app.conf.template > /etc/nginx/conf.d/default.conf &&
-             nginx -g 'daemon off;'"
+    # Remove a publicação "${APP_PORT}:80" da base (docker-compose.yml) — em
+    # produção o acesso é só via Traefik, não direto no host.
+    ports: !override []
     networks:
-      - osticket-net
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.centralmanutencao.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.centralmanutencao.entrypoints=websecure"
+      - "traefik.http.routers.centralmanutencao.tls.certresolver=le"
+      - "traefik.http.routers.centralmanutencao.middlewares=rate-limit@file"
+      - "traefik.http.services.centralmanutencao.loadbalancer.server.port=80"
 
-  # "certbot" NÃO fica rodando como daemon — o desafio DNS-01 manual exige
-  # uma pessoa criando o registro TXT a cada emissão/renovação, então não dá
-  # para automatizar num loop de background. Este serviço só existe para ser
-  # chamado sob demanda:
-  #   docker compose -f docker-compose.yml -f docker-compose.prod.yml run --rm certbot ...
-  # (é isso que scripts/init-letsencrypt.sh e scripts/renew-certificate.sh fazem).
-  # Se um dia migrar para um provedor de DNS com plugin do certbot (Cloudflare,
-  # Route53, etc.), aí sim vale trocar por um serviço com restart automático.
-  certbot:
-    image: certbot/certbot:latest
-    container_name: osticket-certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-    networks:
-      - osticket-net
+networks:
+  traefik-public:
+    external: true

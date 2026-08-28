@@ -279,80 +279,54 @@ Domínio de produção: **`centralmanutencao.zkteco.com.br`**.
    `COPY`-ado na imagem (mais seguro e reproduzível). Faça o build e versione a
    imagem: `docker compose build`.
 
-2. **HTTPS/SSL — Nginx + Certbot (Let's Encrypt) via Docker, na porta 4040:**
-   este servidor já hospeda outras coisas nas portas 80/443, então o helpdesk
-   usa uma porta dedicada: **`https://centralmanutencao.zkteco.com.br:4040`**.
-   Sem a porta 80 disponível, o desafio HTTP-01 do Let's Encrypt (que exige
-   port 80 aberta) não é opção — o certificado é emitido por **desafio DNS-01
-   manual** (cria um registro TXT no DNS do domínio; não depende de porta
-   nenhuma aberta, mas exige repetir a criação do TXT a cada renovação).
+2. **HTTPS/SSL — Traefik compartilhado do servidor:** este servidor de produção
+   já roda um **Traefik** único cuidando das portas 80/443 de todas as
+   aplicações hospedadas nele (emite/renova o certificado Let's Encrypt
+   automaticamente, redireciona HTTP→HTTPS e roteia por hostname). O guia
+   geral está em `traefik-onboarding-devs.md` (raiz do repo) — o que segue é
+   a aplicação específica desse guia a este projeto.
 
-   O repositório traz um override `docker-compose.prod.yml` com dois serviços:
-   - `nginx` — proxy reverso, publica só a porta **4040** (mapeada para o 443
-     interno do container) e encaminha para `app` pela rede interna do Docker.
-   - `certbot` — não fica rodando como daemon (o desafio manual exige uma
-     pessoa criando o TXT, não dá pra automatizar em loop); é chamado sob
-     demanda pelos scripts de emissão/renovação abaixo.
-
-   **Pré-requisitos no servidor Linux:**
-   - DNS de `centralmanutencao.zkteco.com.br` já apontando para o IP público
-     deste servidor.
-   - Porta **4040** liberada no firewall (TCP, entrada).
-   - Acesso para criar um registro **TXT** no DNS do domínio (`zkteco.com.br`)
-     quando o certbot pedir.
-   - `DOMAIN` e `CERTBOT_EMAIL` preenchidos no `.env` (ver `.env.example`).
-
-   **Passo a passo (uma vez só, para emitir o primeiro certificado — rodar
-   num terminal interativo via SSH, o certbot pausa esperando você confirmar
-   o registro TXT):**
-   ```bash
-   cp .env.example .env      # se ainda não existir; preencha DOMAIN/CERTBOT_EMAIL
-   chmod +x scripts/init-letsencrypt.sh scripts/renew-certificate.sh
-   ./scripts/init-letsencrypt.sh
+   O `docker-compose.prod.yml` já faz o necessário: o `app` **não publica
+   porta nenhuma no host** (`ports: !override []` sobre o `${APP_PORT}:80` da
+   base) e se conecta também à rede externa `traefik-public`, com as labels
+   do Traefik apontando para a porta **80 interna** do container (Apache):
+   ```yaml
+   labels:
+     - "traefik.enable=true"
+     - "traefik.http.routers.centralmanutencao.rule=Host(`${DOMAIN}`)"
+     - "traefik.http.routers.centralmanutencao.entrypoints=websecure"
+     - "traefik.http.routers.centralmanutencao.tls.certresolver=le"
+     - "traefik.http.routers.centralmanutencao.middlewares=rate-limit@file"
+     - "traefik.http.services.centralmanutencao.loadbalancer.server.port=80"
    ```
-   O script pede o certificado ao Let's Encrypt via DNS-01: ele mostra um
-   valor para você criar como registro `TXT` em `_acme-challenge.<domínio>`,
-   espera a propagação e só então confirma a emissão — depois sobe o Nginx
-   já com o certificado de verdade (não precisa de certificado "dummy" aqui,
-   diferente do fluxo HTTP-01, porque o Nginx não precisa estar no ar durante
-   a validação DNS).
 
-   > **Teste antes de gastar o rate limit real:** o Let's Encrypt tem limite de
-   > emissões por domínio/semana. Para testar o fluxo sem consumi-lo, rode
-   > primeiro com `STAGING=1 ./scripts/init-letsencrypt.sh` (gera um certificado
-   > de um CA de teste, não confiável pelo navegador, só para validar o
-   > processo) e depois rode de novo sem `STAGING` para o certificado real.
+   **Pré-requisitos no servidor:**
+   - Rede `traefik-public` já existe no host (confirme com `docker network ls`).
+   - DNS de `centralmanutencao.zkteco.com.br` já aponta para o IP do servidor
+     (ou o coringa `*.zkteco.com.br` já cobre).
+   - `DOMAIN` preenchido no `.env` (ver `.env.example`) — é o valor usado na
+     regra `Host()` acima.
 
-   **No dia a dia**, suba o ambiente com os dois arquivos de compose:
+   **Subir:**
    ```bash
+   cp .env.example .env   # se ainda não existir; preencha DOMAIN e as senhas
    docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
    ```
+   Não precisa reiniciar o Traefik — ele detecta o container novo sozinho
+   pelas labels.
 
-   **Renovação (a cada ~60-90 dias, o certificado dura 90):** como o desafio
-   é manual, não há renovação automática. O Let's Encrypt avisa por e-mail
-   (`CERTBOT_EMAIL`) quando está perto de vencer — nessa hora, rode:
+   **Validar:**
    ```bash
-   ./scripts/renew-certificate.sh
+   curl -sI https://centralmanutencao.zkteco.com.br
+   curl -vI https://centralmanutencao.zkteco.com.br 2>&1 | grep -i issuer
    ```
-   (mesmo fluxo: cria um novo registro TXT, confirma, recarrega o Nginx).
+   Erros comuns (`404`, `502`, certificado não emite) estão documentados em
+   `traefik-onboarding-devs.md`, seção "Erros comuns".
 
-   > **Quer automatizar a renovação?** Se o DNS de `zkteco.com.br` estiver num
-   > provedor com plugin de DNS do certbot (Cloudflare, Route53, GoDaddy etc.)
-   > e você conseguir um token de API, dá pra trocar o desafio manual por um
-   > plugin automático e voltar a ter um serviço `certbot` renovando sozinho
-   > em background — nesse caso, é só pedir para eu ajustar.
+   > Sem certbot, sem Nginx próprio, sem porta dedicada — o Traefik do
+   > servidor cuida de tudo isso centralizadamente.
 
-   **Alternativa (Cloudflare em vez de Nginx próprio):** colocar o domínio
-   atrás do **Cloudflare** (proxy laranja ligado) — o Cloudflare já termina o
-   TLS na borda (modo SSL/TLS **"Full"** ou **"Full (strict)"**, nunca
-   "Flexible" com HTTPS forçado, senão vira loop de redirecionamento) e ainda
-   entrega o Turnstile (item 8) e o WAF/anti-DDoS gratuitos. Nesse caso **não**
-   use o `docker-compose.prod.yml` (sem Nginx/Certbot) — o container recebe
-   HTTP puro na porta `${APP_PORT}` (como hoje), mas com os cabeçalhos
-   `X-Forwarded-Proto`/`X-Forwarded-For` do Cloudflare — é exatamente para
-   isso que servem `TRUSTED_PROXIES` e o `force_https` do item 8.
-
-3. **Helpdesk URL:** ajuste para `https://centralmanutencao.zkteco.com.br:4040/`
+3. **Helpdesk URL:** ajuste para `https://centralmanutencao.zkteco.com.br/`
    no painel admin (*Painel Admin → Configurações → Sistema → Helpdesk URL*), e
    marque **"Force HTTPS"** (`force_https`) — ver item 8 abaixo.
 4. **Ambientes separados:** use arquivos `.env` diferentes e, se quiser, arquivos
@@ -377,10 +351,12 @@ Domínio de produção: **`centralmanutencao.zkteco.com.br`**.
    2. No `.env` de produção, preencha `TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET_KEY`
       (vazio = CAPTCHA desligado — é assim que o dev local continua livre).
    3. Preencha `TRUSTED_PROXIES`:
-      - **Atrás do Nginx próprio** (`docker-compose.prod.yml`, seção 11 item 2):
-        use a sub-rede da rede interna do Docker (`docker network inspect
-        osticket-zkteco_osticket-net` → campo `Subnet`, tipicamente algo como
-        `172.x.0.0/16`) — é de lá que o container `nginx` fala com o `app`.
+      - **Atrás do Traefik do servidor** (`docker-compose.prod.yml`, seção 11
+        item 2): use a sub-rede da rede `traefik-public` (`docker network
+        inspect traefik-public` → campo `Subnet`) — é de lá que o Traefik fala
+        com o `app`. Se o time de infra já tiver essa informação documentada
+        (provavelmente sim, já que outras apps do servidor passam pelo mesmo
+        Traefik), peça a eles em vez de assumir.
       - **Atrás do Cloudflare:** use os ranges oficiais de IP do Cloudflare
         (IPv4 + IPv6, lista em <https://www.cloudflare.com/ips/>) — sem isso, o
         IP do visitante nos logs/rate-limit vira o IP do próprio Cloudflare.
