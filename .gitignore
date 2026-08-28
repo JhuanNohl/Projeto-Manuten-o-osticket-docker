@@ -8,6 +8,9 @@
 # Dados do banco (volume) — não aplicável (volume gerenciado), mas por segurança
 /db/data/
 
+# Certificados Let's Encrypt (chave privada + certificados emitidos)
+/certbot/
+
 # Logs
 *.log
 

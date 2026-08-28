@@ -270,41 +270,91 @@ Compress-Archive -Path "C:\xampp\htdocs\osTicket\upload\*" -DestinationPath "bac
 
 ---
 
-## 11. Caminho para PRODUÇÃO (suporte.zkteco.com.br)
+## 11. Caminho para PRODUÇÃO (centralmanutencao.zkteco.com.br)
 
-Recomendação: subdomínio **`suporte.zkteco.com.br`** dedicado (isola o helpdesk
-do site institucional).
+Domínio de produção: **`centralmanutencao.zkteco.com.br`**.
 
 1. **Imagem autocontida (sem bind-mount):** no `docker-compose.yml` de produção,
    **comente** o volume `./app:/var/www/html`. Assim o código roda do que foi
    `COPY`-ado na imagem (mais seguro e reproduzível). Faça o build e versione a
    imagem: `docker compose build`.
-2. **HTTPS/SSL:** coloque um **proxy reverso** na frente (Nginx, Traefik ou
-   Caddy) terminando TLS com **Let's Encrypt**. Exemplo de bloco Nginx:
-   ```nginx
-   server {
-     server_name suporte.zkteco.com.br;
-     location / { proxy_pass http://127.0.0.1:8080;
-       proxy_set_header Host $host;
-       proxy_set_header X-Real-IP $remote_addr;
-       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-       proxy_set_header X-Forwarded-Proto $scheme;
-     }
-     # (bloco 443 com certificado do certbot)
-   }
-   ```
-   (Traefik/Caddy fazem o certificado automaticamente — mais simples.)
 
-   **Alternativa usada no piloto público:** colocar o domínio atrás do
-   **Cloudflare** (proxy laranja ligado) em vez de um reverso próprio — o
-   Cloudflare já termina o TLS na borda (modo SSL/TLS **"Full"** ou
-   **"Full (strict)"**, nunca "Flexible" com HTTPS forçado, senão vira loop
-   de redirecionamento) e ainda entrega o Turnstile (item 8) e o WAF/anti-DDoS
-   gratuitos. Nesse caso o container continua recebendo HTTP puro na porta
-   8080 (como hoje), mas com os cabeçalhos `X-Forwarded-Proto`/`X-Forwarded-For`
-   do Cloudflare — é exatamente para isso que servem `TRUSTED_PROXIES` e o
-   `force_https` do item 8.
-3. **Helpdesk URL:** ajuste para `https://suporte.zkteco.com.br/` no painel admin.
+2. **HTTPS/SSL — Nginx + Certbot (Let's Encrypt) via Docker, na porta 4040:**
+   este servidor já hospeda outras coisas nas portas 80/443, então o helpdesk
+   usa uma porta dedicada: **`https://centralmanutencao.zkteco.com.br:4040`**.
+   Sem a porta 80 disponível, o desafio HTTP-01 do Let's Encrypt (que exige
+   port 80 aberta) não é opção — o certificado é emitido por **desafio DNS-01
+   manual** (cria um registro TXT no DNS do domínio; não depende de porta
+   nenhuma aberta, mas exige repetir a criação do TXT a cada renovação).
+
+   O repositório traz um override `docker-compose.prod.yml` com dois serviços:
+   - `nginx` — proxy reverso, publica só a porta **4040** (mapeada para o 443
+     interno do container) e encaminha para `app` pela rede interna do Docker.
+   - `certbot` — não fica rodando como daemon (o desafio manual exige uma
+     pessoa criando o TXT, não dá pra automatizar em loop); é chamado sob
+     demanda pelos scripts de emissão/renovação abaixo.
+
+   **Pré-requisitos no servidor Linux:**
+   - DNS de `centralmanutencao.zkteco.com.br` já apontando para o IP público
+     deste servidor.
+   - Porta **4040** liberada no firewall (TCP, entrada).
+   - Acesso para criar um registro **TXT** no DNS do domínio (`zkteco.com.br`)
+     quando o certbot pedir.
+   - `DOMAIN` e `CERTBOT_EMAIL` preenchidos no `.env` (ver `.env.example`).
+
+   **Passo a passo (uma vez só, para emitir o primeiro certificado — rodar
+   num terminal interativo via SSH, o certbot pausa esperando você confirmar
+   o registro TXT):**
+   ```bash
+   cp .env.example .env      # se ainda não existir; preencha DOMAIN/CERTBOT_EMAIL
+   chmod +x scripts/init-letsencrypt.sh scripts/renew-certificate.sh
+   ./scripts/init-letsencrypt.sh
+   ```
+   O script pede o certificado ao Let's Encrypt via DNS-01: ele mostra um
+   valor para você criar como registro `TXT` em `_acme-challenge.<domínio>`,
+   espera a propagação e só então confirma a emissão — depois sobe o Nginx
+   já com o certificado de verdade (não precisa de certificado "dummy" aqui,
+   diferente do fluxo HTTP-01, porque o Nginx não precisa estar no ar durante
+   a validação DNS).
+
+   > **Teste antes de gastar o rate limit real:** o Let's Encrypt tem limite de
+   > emissões por domínio/semana. Para testar o fluxo sem consumi-lo, rode
+   > primeiro com `STAGING=1 ./scripts/init-letsencrypt.sh` (gera um certificado
+   > de um CA de teste, não confiável pelo navegador, só para validar o
+   > processo) e depois rode de novo sem `STAGING` para o certificado real.
+
+   **No dia a dia**, suba o ambiente com os dois arquivos de compose:
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+   ```
+
+   **Renovação (a cada ~60-90 dias, o certificado dura 90):** como o desafio
+   é manual, não há renovação automática. O Let's Encrypt avisa por e-mail
+   (`CERTBOT_EMAIL`) quando está perto de vencer — nessa hora, rode:
+   ```bash
+   ./scripts/renew-certificate.sh
+   ```
+   (mesmo fluxo: cria um novo registro TXT, confirma, recarrega o Nginx).
+
+   > **Quer automatizar a renovação?** Se o DNS de `zkteco.com.br` estiver num
+   > provedor com plugin de DNS do certbot (Cloudflare, Route53, GoDaddy etc.)
+   > e você conseguir um token de API, dá pra trocar o desafio manual por um
+   > plugin automático e voltar a ter um serviço `certbot` renovando sozinho
+   > em background — nesse caso, é só pedir para eu ajustar.
+
+   **Alternativa (Cloudflare em vez de Nginx próprio):** colocar o domínio
+   atrás do **Cloudflare** (proxy laranja ligado) — o Cloudflare já termina o
+   TLS na borda (modo SSL/TLS **"Full"** ou **"Full (strict)"**, nunca
+   "Flexible" com HTTPS forçado, senão vira loop de redirecionamento) e ainda
+   entrega o Turnstile (item 8) e o WAF/anti-DDoS gratuitos. Nesse caso **não**
+   use o `docker-compose.prod.yml` (sem Nginx/Certbot) — o container recebe
+   HTTP puro na porta `${APP_PORT}` (como hoje), mas com os cabeçalhos
+   `X-Forwarded-Proto`/`X-Forwarded-For` do Cloudflare — é exatamente para
+   isso que servem `TRUSTED_PROXIES` e o `force_https` do item 8.
+
+3. **Helpdesk URL:** ajuste para `https://centralmanutencao.zkteco.com.br:4040/`
+   no painel admin (*Painel Admin → Configurações → Sistema → Helpdesk URL*), e
+   marque **"Force HTTPS"** (`force_https`) — ver item 8 abaixo.
 4. **Ambientes separados:** use arquivos `.env` diferentes e, se quiser, arquivos
    compose por ambiente:
    - `docker compose --env-file .env.dev up -d`
@@ -326,9 +376,14 @@ do site institucional).
       Widget* e copie a **Site Key** e a **Secret Key**.
    2. No `.env` de produção, preencha `TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET_KEY`
       (vazio = CAPTCHA desligado — é assim que o dev local continua livre).
-   3. Preencha `TRUSTED_PROXIES` com os ranges oficiais de IP do Cloudflare
-      (IPv4 + IPv6, lista em <https://www.cloudflare.com/ips/>) — sem isso, o
-      IP do visitante nos logs/rate-limit vira o IP do próprio Cloudflare.
+   3. Preencha `TRUSTED_PROXIES`:
+      - **Atrás do Nginx próprio** (`docker-compose.prod.yml`, seção 11 item 2):
+        use a sub-rede da rede interna do Docker (`docker network inspect
+        osticket-zkteco_osticket-net` → campo `Subnet`, tipicamente algo como
+        `172.x.0.0/16`) — é de lá que o container `nginx` fala com o `app`.
+      - **Atrás do Cloudflare:** use os ranges oficiais de IP do Cloudflare
+        (IPv4 + IPv6, lista em <https://www.cloudflare.com/ips/>) — sem isso, o
+        IP do visitante nos logs/rate-limit vira o IP do próprio Cloudflare.
    4. `docker compose up -d --build` (o Dockerfile passou a instalar a
       extensão `curl`, usada para validar o token do Turnstile).
    5. Em *Painel Admin → Configurações → Sistema*, marque **"Force HTTPS"**
