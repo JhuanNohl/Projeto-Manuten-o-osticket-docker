@@ -1,442 +1,261 @@
-# osTicket ZKTeco — Ambiente Docker (migração do XAMPP)
+# Central de Manutenção ZKTeco
 
-Migração do osTicket **v1.17.8** (que rodava no XAMPP) para **Docker Compose**,
-com containers separados para aplicação (PHP 8.2 + Apache) e banco (MariaDB 10.6),
-**preservando todos os dados e customizações**. O projeto está em produção interna
-(chamados reais sendo abertos) e agora versionado em **Git**.
+Portal de atendimento e RMA baseado no **osTicket 1.17.8**, adaptado para acompanhar equipamentos enviados à manutenção e incorporar atendimentos do sistema anterior. Atende clientes pelo portal público e a equipe pelo painel de agentes, com cadastro, documentos, fotos, andamento dos equipamentos e notificações por e-mail.
 
-> ⚠️ **O ambiente XAMPP original NÃO foi tocado.** Tudo aqui foi feito a partir de
-> *cópias*. Se algo desse errado, o XAMPP legado continuaria funcionando como estava.
+Este documento descreve o código disponível em **18/09/2026**. O cadastro pela equipe, a migração, a troca obrigatória da senha inicial e o recebimento dos e-mails de atribuição e de acesso foram confirmados pelo responsável em produção. O encaminhamento automático e a consolidação de departamentos são uma atualização posterior: **publicar o código e aplicar a consolidação no banco são etapas separadas**.
 
----
+## Funcionalidades e fluxos
 
-## 1. Resumo do ambiente detectado
+### Abertura e acompanhamento pelo cliente
 
-| Item | Valor |
+O cliente cadastra seus dados, acessa seus chamados e abre um RMA com um ou vários equipamentos. Cada equipamento contém modelo, número de série, falha apresentada, observação, solicitação de garantia e fotos. Na abertura, são exigidas pelo menos uma e no máximo cinco fotos por equipamento; o servidor verifica o conteúdo dos arquivos.
+
+O RMA recebe Nota Fiscal em XML ou Declaração de Conteúdo em PDF, JPG, JPEG ou PNG. Os dois documentos podem coexistir. Anexar o XML e verificar seus dados são etapas distintas: o painel possui verificação da nota e apresenta as inconsistências encontradas, conforme as regras configuradas no projeto.
+
+O fluxo do cliente mantém transportadora, rastreio e confirmação de envio. Após o recebimento na fábrica, o portal reconhece essa etapa e restringe a edição dos dados do equipamento conforme o andamento do chamado.
+
+| Recurso | Operação |
 |---|---|
-| osTicket | v1.17.8 (fortemente customizado — ver `CUSTOMIZACOES_OSTICKET.md`) |
-| PHP | 8.2 (igual ao XAMPP original) |
-| Banco | MariaDB 10.6 (XAMPP usava 10.4) |
-| Nome do banco | `zkteco_manutencao` |
-| Usuário / prefixo | `osticket` / `ost_` |
-| Charset / collation | `utf8` / `utf8_general_ci` |
-| Anexos | **armazenados no banco** (backend `D`) → o dump `.sql` já contém tudo |
-| Nome do projeto Docker Compose | `osticket-zkteco` (fixo — ver seção 3) |
-| Acesso local | http://localhost:8080 |
+| Andamento por equipamento | Aguardando envio, em transporte, recebido, em diagnóstico, aguardando cliente/peça, em manutenção, em testes, concluído, bloqueado ou cancelado. |
+| Progresso do RMA | Calculado a partir das etapas dos equipamentos; o progresso de cada item compõe o total. |
+| Garantia | O cliente solicita análise; a equipe registra aprovação ou recusa. |
+| Documentação | Anexos, verificação do XML e indicação das pendências documentais. |
+| Comunicação | Respostas, anexos e histórico do chamado; notificações de alterações relevantes por e-mail. |
+| Consulta | Acesso aos chamados do próprio cliente e visualização do laudo disponibilizado pela equipe. |
 
-> **Como confirmar o nome do banco** (caso mude no futuro): abra
-> `app/include/ost-config.php` e veja `DBNAME`, `DBUSER`, `TABLE_PREFIX`.
+### Abertura e manutenção pelo agente
 
----
+Em **Manutenções → Novo RMA**, o agente pesquisa um cliente existente ou cadastra um cliente no próprio formulário. O cadastro utiliza os campos ativos, incluindo CPF/CNPJ, e informa erros de validação. A abertura associa o chamado ao cliente selecionado e utiliza o mesmo componente de equipamentos, fotos e documentos do portal do cliente.
 
-## 2. Estrutura do projeto
+A equipe pode atualizar status, garantia, laudo visível ao cliente e nota interna dos equipamentos. Também pode adicionar fotos pelo celular usando o QR Code disponibilizado no chamado. As alterações de acompanhamento ficam registradas no histórico.
 
-```
-<raiz-do-projeto>\
-├─ app\               # Aplicação osTicket + TODAS as customizações
-├─ db\
-│  ├─ init\           # Dump .sql — restaurado AUTOMATICAMENTE só no 1º "up" (volume vazio)
-│  ├─ migrations\     # Alterações de schema aplicadas manualmente após o dump inicial
-│  └─ backups\        # Backups pontuais (pré-mudança) gerados durante o desenvolvimento
-├─ backups\           # Backups gerados pelos scripts (datados)
-├─ docker\            # Dockerfile + configs de Apache e PHP (assadas na imagem)
-├─ scripts\           # Atalhos .bat para Windows
-├─ docker-compose.yml
-├─ .env               # Senhas/variáveis reais (NÃO versionar)
-├─ .env.example       # Modelo sem senhas
-├─ CUSTOMIZACOES_OSTICKET.md  # Log detalhado de TODA customização feita no core
-└─ README.md          # Este guia
-```
+O formulário do agente foi simplificado: assunto e conteúdo inicial são gerados a partir dos equipamentos; os campos redundantes de resposta inicial, assinatura e cópias foram retirados. **A abertura pelo agente não solicita envio do produto.** Essa mudança não remove o envio no formulário do cliente.
 
-- **app/** — o código que você edita/customiza. Em desenvolvimento ele é
-  "montado" ao vivo dentro do container (bind-mount).
-- **db/init/** — qualquer `.sql` aqui é executado **na primeira vez** que o banco
-  sobe (volume vazio). É assim que os dados entram no Docker. **Este arquivo é
-  ignorado pelo Git** (contém dados reais de clientes) — ver seção 3.2.
-- **db/migrations/** — mudanças de schema feitas à mão depois do dump inicial
-  (ex.: novos menus, banner de login). Ainda não são aplicadas automaticamente
-  (ver seção 13 — proposta).
-- **backups/** e **db/backups/** — dumps pontuais; nenhum dos dois é versionado.
-- **docker/** — receita da imagem (extensões PHP, vhost, php.ini).
-- **CUSTOMIZACOES_OSTICKET.md** — histórico item a item de toda mudança feita
-  no core do osTicket, essencial antes de qualquer upgrade de versão.
-- Não há pasta de *uploads* separada porque **os anexos ficam no banco**.
+### Migração de equipamentos que já estão na fábrica
 
----
+O agente marca **Migração do sistema antigo** quando o equipamento já estava em atendimento antes do novo portal. Nesse caso:
 
-## 3. Controle de versão (Git) e nome do projeto Docker
+1. Seleciona ou cadastra o cliente e informa os equipamentos, fotos e documentos disponíveis.
+2. Quando faltar documentação, marca explicitamente a pendência de migração; o sistema registra uma nota interna. Um arquivo inválido continua sendo recusado mesmo com essa opção marcada.
+3. O equipamento inicia como **Recebido**, e o chamado assume esse status quando ele está configurado. Não é necessário inventar despacho, transportadora ou rastreio.
+4. Se o cliente ainda não possuir conta de acesso, o sistema cria uma conta confirmada com senha provisória **`zkteco1234`** e exige a troca no primeiro acesso. O cliente não precisa confirmar o cadastro para começar a usar a conta.
+5. O cliente recebe o aviso de atribuição do atendimento e o aviso de criação da conta, com endereço do portal, e-mail de login, senha provisória e orientação para trocá-la.
 
-O projeto foi movido para um repositório Git. Duas coisas mudaram de
-comportamento por causa disso e vale entender:
+Uma conta já existente mantém sua senha. A senha provisória só aparece no aviso quando ainda é válida e a troca continua obrigatória. O procedimento não redefine a senha de quem já concluiu essa troca.
 
-### 3.1 Nome do projeto Docker Compose agora é fixo
+Se o envio do aviso falhar, o sistema preserva a conta e o chamado, mostra **RMA criado com pendências** e registra a falha no log. Não é necessário criar outro RMA para corrigir uma notificação.
 
-Por padrão, o Docker Compose deriva o "nome do projeto" (usado para nomear o
-volume do banco e a rede interna) a partir do **nome da pasta**. Isso é um
-problema para um repositório Git, porque qualquer pessoa pode clonar em uma
-pasta com nome diferente — e o Compose criaria um volume **novo e vazio**,
-"perdendo" o banco de dados (que continuaria existindo, só que órfão, sob o
-nome do projeto antigo).
+### Encaminhamento automático para Manutenção
 
-Por isso o `docker-compose.yml` agora tem:
-```yaml
-name: osticket-zkteco
-```
-Isso fixa o nome do projeto (e, portanto, do volume `osticket-zkteco_db_data`
-e da rede `osticket-zkteco_osticket-net`) **independente de onde ou com que
-nome a pasta for clonada/renomeada**. Os nomes dos containers (`osticket-app`,
-`osticket-db`) já eram fixos via `container_name` e não são afetados por isso.
+O grupo **Opções de encaminhamento (opcional)** deixa de ser exibido na abertura pelo agente. As definições são aplicadas no servidor:
 
-> Esse ajuste foi necessário justamente ao renomear a pasta do projeto para
-> publicá-lo no Git (o projeto antigo, sem nome fixo, havia gerado o volume
-> `new-projetomanuteno-osticket-docker_db_data`). Os dados foram migrados por
-> cópia direta de arquivos para o volume novo `osticket-zkteco_db_data`; o
-> volume antigo já foi removido após a confirmação de que tudo estava
-> funcionando corretamente.
-
-### 3.2 O que é ignorado pelo Git — e a lacuna que isso cria
-
-O `.gitignore` deixa de fora `.env`, `/backups/` e `/db/init/*.sql` de
-propósito (contêm senhas ou dados reais de clientes). Isso é correto para
-segurança, mas tem uma consequência: **um clone novo do repositório não vem
-com nenhum dump em `db/init/`**, então o banco sobe com o schema vazio na
-primeira vez.
-
-Até que isso seja automatizado (ver seção 13), para preparar um ambiente novo
-a partir do zero:
-1. Copie `.env.example` para `.env` e defina senhas fortes.
-2. Obtenha um dump (`.sql`) de uma instância existente (seção 6 — Backup) e
-   coloque-o em `db/init/` **antes** do primeiro `docker compose up`.
-3. Suba o ambiente normalmente (seção 4).
-
----
-
-## 4. Pré-requisitos (uma vez só)
-
-1. **Docker Desktop + WSL2** (Windows 10/11):
-   - Instale o **WSL2**: abra o **PowerShell como Administrador** e rode:
-     ```powershell
-     wsl --install
-     ```
-     Reinicie o Windows se pedir.
-   - Baixe e instale o **Docker Desktop**: https://www.docker.com/products/docker-desktop/
-   - Em *Settings → General*, deixe marcado **"Use the WSL 2 based engine"**.
-   - Abra o Docker Desktop e espere o ícone ficar verde ("Engine running").
-2. Confirme no **PowerShell**:
-   ```powershell
-   docker --version
-   docker compose version
-   ```
-
-> 💡 **Desempenho (opcional):** bind-mount de pastas do Windows (`C:\...`) para
-> dentro do WSL2 é mais lento. Para dev pesado, você pode mover o projeto para
-> dentro do WSL2 (ex.: `\\wsl$\Ubuntu\home\voce\osticket-docker`).
-
----
-
-## 5. Subir o ambiente (primeira vez)
-
-> Execute no **PowerShell** ou **CMD**, dentro da raiz do projeto (onde está
-> o `docker-compose.yml`). (Ou dê **duplo-clique** em `scripts\iniciar_osticket.bat`.)
-
-```powershell
-docker compose up -d --build
-```
-
-O que acontece automaticamente:
-1. A imagem `app` é construída (PHP 8.2 + Apache + extensões). *(demora só na 1ª vez)*
-2. O banco sobe e, por estar **vazio**, importa o que houver em `db\init\*.sql`
-   (ver seção 3.2 se for um clone novo do repositório).
-3. O `app` conecta no banco pelo host `db` (rede interna do Docker, nome fixo
-   `osticket-zkteco_osticket-net`).
-
-Acompanhe a restauração/subida:
-```powershell
-docker compose logs -f
-```
-Quando aparecer o banco "ready for connections" e o Apache no ar, acesse:
-
-- **Portal do cliente:** http://localhost:8080
-- **Painel da equipe:** http://localhost:8080/scp/
-
-> A primeira importação do banco pode levar alguns segundos. Se o `app` reiniciar
-> enquanto o banco ainda inicializa, é normal — o `depends_on: healthy` faz ele
-> esperar; aguarde e recarregue.
-
----
-
-## 6. Comandos úteis
-
-> Todos no **PowerShell/CMD**, dentro da raiz do projeto.
-
-| Ação | Comando | Atalho .bat |
-|---|---|---|
-| Subir | `docker compose up -d` | `scripts\iniciar_osticket.bat` |
-| Parar (mantém dados) | `docker compose stop` | `scripts\parar_osticket.bat` |
-| Reiniciar | `docker compose restart` | — |
-| Derrubar (remove containers, mantém volume/dados) | `docker compose down` | — |
-| Ver logs ao vivo | `docker compose logs -f` | `scripts\logs_osticket.bat` |
-| Status | `docker compose ps` | — |
-| Reconstruir imagem | `docker compose build --no-cache` | — |
-| Abrir shell no app | `docker compose exec app bash` | — |
-| Abrir o MySQL/MariaDB | `docker compose exec db mariadb -u root -p"$env:DB_ROOT_PASSWORD" zkteco_manutencao` | — |
-| Backup do banco | veja seção 7 | `scripts\backup_osticket.bat` |
-| Restaurar backup | veja seção 7 | `scripts\restaurar_backup.bat` |
-
-Acessar o banco (alternativa simples, dentro do container):
-```powershell
-docker compose exec db bash
-# dentro do container:
-mariadb -u osticket -p zkteco_manutencao      # senha do .env (DB_PASSWORD)
-```
-
----
-
-## 7. Backup e restauração
-
-### Backup (recomendado: rodar antes de qualquer mudança grande)
-- **Fácil:** duplo-clique em `scripts\backup_osticket.bat` → gera
-  `backups\backup_AAAAMMDD_HHMMSS.sql`.
-- **Manual (PowerShell):**
-  ```powershell
-  docker compose exec -T db sh -c 'exec mariadb-dump -u root -p"$MARIADB_ROOT_PASSWORD" --single-transaction --hex-blob --default-character-set=utf8 "$MARIADB_DATABASE"' > backups\backup_manual.sql
-  ```
-  `--hex-blob` preserva os anexos (que estão no banco).
-
-### Restauração
-- **Fácil:** `scripts\restaurar_backup.bat` (pede o caminho e confirma).
-- **Manual (PowerShell):**
-  ```powershell
-  docker compose exec -T db sh -c 'exec mariadb -u root -p"$MARIADB_ROOT_PASSWORD" "$MARIADB_DATABASE"' < backups\backup_AAAAMMDD_HHMMSS.sql
-  ```
-
-### Reimportar o dump inicial do zero
-A pasta `db/init` só roda com o **volume vazio**. Para recomeçar limpo
-(⚠️ apaga o banco do container):
-```powershell
-docker compose down -v        # -v remove o volume db_data
-docker compose up -d          # importa de novo o db\init\*.sql
-```
-
----
-
-## 8. Backup completo do XAMPP (referência histórica)
-
-O XAMPP original não é mais usado no dia a dia, mas se precisar de um snapshot
-arquivado da instalação original (pré-Docker), rode no **PowerShell**:
-```powershell
-# Dump do banco direto do XAMPP:
-& "C:\xampp\mysql\bin\mysqldump.exe" -u osticket -p123456 --single-transaction --hex-blob --default-character-set=utf8 zkteco_manutencao > backups\xampp_db_snapshot.sql
-
-# Zip da pasta da aplicação do XAMPP:
-Compress-Archive -Path "C:\xampp\htdocs\osTicket\upload\*" -DestinationPath "backups\xampp_upload_snapshot.zip" -Force
-```
-
----
-
-## 9. Checklist de validação
-
-- [ ] `docker compose ps` mostra `osticket-app` e `osticket-db` como *Up* (db *healthy*).
-- [ ] http://localhost:8080 abre o portal do cliente (tema ZKTeco, verde/grafite).
-- [ ] http://localhost:8080/scp/ abre o login da equipe; login funciona.
-- [ ] Lista de chamados aparece; abrir um chamado existente funciona.
-- [ ] Anexos abrem/baixam (ex.: a Nota Fiscal XML do chamado).
-- [ ] Acentos em português corretos (ç, ã, õ) nas telas e nos e-mails.
-- [ ] Customizações visuais presentes (CSS ZKTeco, pop-ups, cabeçalho do chamado).
-- [ ] Fluxo de equipamentos (abertura → NF → envio → confirmação) funciona ponta a ponta.
-- [ ] E-mail (se configurado): teste SMTP em *Admin → Emails*; e a busca IMAP/POP.
-- [ ] `docker compose logs` sem erros de PHP/Apache/banco.
-
-> **URL do helpdesk (opcional):** o osTicket guarda a URL base no banco (usada em
-> **links de e-mail**). Como agora a raiz é `http://localhost:8080/`, se quiser
-> ajustar: *Painel Admin → Configurações → Sistema → Helpdesk URL*. No dia da
-> produção, troque para o domínio real (ex.: `https://suporte.zkteco.com.br/`).
-
----
-
-## 10. Segurança das senhas (importante)
-
-- As senhas iniciais no `.env` **repetem as do XAMPP** só para a migração ter
-  funcionado de imediato. **Antes de expor publicamente, troque todas** por
-  senhas fortes:
-  1. Edite `.env` (novos `DB_PASSWORD` e `DB_ROOT_PASSWORD`).
-  2. A `DBPASS` do osTicket vem do `.env` (via `OST_DBPASS`) — não precisa mexer
-     no `ost-config.php`.
-  3. Recrie o banco com a nova senha:
-     `docker compose down -v && docker compose up -d`
-     (ele reimporta o `db/init` já com a senha nova).
-- O `.env` está no `.gitignore` — **nunca** comite senhas.
-- O `include/ost-config.php` **não tem senha fixa** (lê do ambiente).
-
----
-
-## 11. Caminho para PRODUÇÃO (centralmanutencao.zkteco.com.br)
-
-Domínio de produção: **`centralmanutencao.zkteco.com.br`**.
-
-1. **Imagem autocontida (sem bind-mount):** no `docker-compose.yml` de produção,
-   **comente** o volume `./app:/var/www/html`. Assim o código roda do que foi
-   `COPY`-ado na imagem (mais seguro e reproduzível). Faça o build e versione a
-   imagem: `docker compose build`.
-
-2. **HTTPS/SSL — Traefik compartilhado do servidor:** este servidor de produção
-   já roda um **Traefik** único cuidando das portas 80/443 de todas as
-   aplicações hospedadas nele (emite/renova o certificado Let's Encrypt
-   automaticamente, redireciona HTTP→HTTPS e roteia por hostname). O guia
-   geral está em `traefik-onboarding-devs.md` (raiz do repo) — o que segue é
-   a aplicação específica desse guia a este projeto.
-
-   O `docker-compose.prod.yml` já faz o necessário: o `app` **não publica
-   porta nenhuma no host** (`ports: !override []` sobre o `${APP_PORT}:80` da
-   base) e se conecta também à rede externa `traefik-public`, com as labels
-   do Traefik apontando para a porta **80 interna** do container (Apache):
-   ```yaml
-   labels:
-     - "traefik.enable=true"
-     - "traefik.http.routers.centralmanutencao.rule=Host(`${DOMAIN}`)"
-     - "traefik.http.routers.centralmanutencao.entrypoints=websecure"
-     - "traefik.http.routers.centralmanutencao.tls.certresolver=le"
-     - "traefik.http.routers.centralmanutencao.middlewares=rate-limit@file"
-     - "traefik.http.services.centralmanutencao.loadbalancer.server.port=80"
-   ```
-
-   **Pré-requisitos no servidor:**
-   - Rede `traefik-public` já existe no host (confirme com `docker network ls`).
-   - DNS de `centralmanutencao.zkteco.com.br` já aponta para o IP do servidor
-     (ou o coringa `*.zkteco.com.br` já cobre).
-   - `DOMAIN` preenchido no `.env` (ver `.env.example`) — é o valor usado na
-     regra `Host()` acima.
-
-   **Subir:**
-   ```bash
-   cp .env.example .env   # se ainda não existir; preencha DOMAIN e as senhas
-   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-   ```
-   Não precisa reiniciar o Traefik — ele detecta o container novo sozinho
-   pelas labels.
-
-   **Validar:**
-   ```bash
-   curl -sI https://centralmanutencao.zkteco.com.br
-   curl -vI https://centralmanutencao.zkteco.com.br 2>&1 | grep -i issuer
-   ```
-   Erros comuns (`404`, `502`, certificado não emite) estão documentados em
-   `traefik-onboarding-devs.md`, seção "Erros comuns".
-
-   > Sem certbot, sem Nginx próprio, sem porta dedicada — o Traefik do
-   > servidor cuida de tudo isso centralizadamente.
-
-3. **Helpdesk URL:** ajuste para `https://centralmanutencao.zkteco.com.br/`
-   no painel admin (*Painel Admin → Configurações → Sistema → Helpdesk URL*), e
-   marque **"Force HTTPS"** (`force_https`) — ver item 8 abaixo.
-4. **Ambientes separados:** use arquivos `.env` diferentes e, se quiser, arquivos
-   compose por ambiente:
-   - `docker compose --env-file .env.dev up -d`
-   - `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d`
-   Sugestão de fluxo: **dev** (sua máquina) → **homologação** (VM/servidor de
-   testes, dados fictícios) → **produção**.
-5. **Cron (importante em produção):** o osTicket precisa de tarefas periódicas
-   (buscar e-mails, SLA, etc.). O "autocron" roda em acessos de página, mas o
-   ideal é um cron real. Ex.: no host, a cada 5 min:
-   ```
-   */5 * * * * docker compose -f /caminho/docker-compose.yml exec -T app php /var/www/html/api/cron.php
-   ```
-6. **Backups automáticos:** agende o `backup_osticket.bat` (Agendador de Tarefas
-   do Windows) ou um cron no servidor, e leve os `.sql` para fora da máquina.
-7. **Boas práticas:** senhas fortes; remover `setup/` (já removido nesta cópia);
-   manter Docker/imagens atualizados; **testar upgrades sempre em homologação**.
-8. **CAPTCHA (Cloudflare Turnstile) + IP real atrás de proxy:**
-   1. Crie um widget em <https://dash.cloudflare.com/> → **Turnstile** → *Add
-      Widget* e copie a **Site Key** e a **Secret Key**.
-   2. No `.env` de produção, preencha `TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET_KEY`
-      (vazio = CAPTCHA desligado — é assim que o dev local continua livre).
-   3. Preencha `TRUSTED_PROXIES`:
-      - **Atrás do Traefik do servidor** (`docker-compose.prod.yml`, seção 11
-        item 2): use a sub-rede da rede `traefik-public` (`docker network
-        inspect traefik-public` → campo `Subnet`) — é de lá que o Traefik fala
-        com o `app`. Se o time de infra já tiver essa informação documentada
-        (provavelmente sim, já que outras apps do servidor passam pelo mesmo
-        Traefik), peça a eles em vez de assumir.
-      - **Atrás do Cloudflare:** use os ranges oficiais de IP do Cloudflare
-        (IPv4 + IPv6, lista em <https://www.cloudflare.com/ips/>) — sem isso, o
-        IP do visitante nos logs/rate-limit vira o IP do próprio Cloudflare.
-   4. `docker compose up -d --build` (o Dockerfile passou a instalar a
-      extensão `curl`, usada para validar o token do Turnstile).
-   5. Em *Painel Admin → Configurações → Sistema*, marque **"Force HTTPS"**
-      (`force_https`) — o core já detecta HTTPS via `X-Forwarded-Proto`, sem
-      precisar de certificado dentro do container.
-9. **SQL Injection:** o código customizado (`zk_equipment.php` e módulos
-   ligados a ele) foi auditado — todo valor dinâmico passa por `db_input()`
-   antes de qualquer `db_query()`. Ao adicionar SQL novo no projeto, siga o
-   mesmo padrão (nunca concatenar `$_POST`/`$_GET` direto na query).
-
----
-
-## 12. Atualizar o osTicket com segurança
-
-1. **Backup** primeiro (`backup_osticket.bat`) e snapshot da pasta `app/`.
-2. Baixe a nova versão do osTicket e **reaplique as customizações** por cima
-   (elas estão documentadas em `CUSTOMIZACOES_OSTICKET.md`). Não sobrescreva
-   cegamente — muitas mudanças são em arquivos core.
-3. Suba com a pasta `setup/` temporariamente presente (o osTicket roda o
-   assistente de upgrade do banco) **em homologação** antes de produção.
-4. Valide pelo checklist (seção 9).
-
----
-
-## 13. Estado atual e próximos passos (proposta)
-
-**Onde o projeto está hoje:**
-- Ambiente Docker estável, em uso real (chamados de produção sendo criados).
-- Customização extensa sobre o core do osTicket (módulo próprio de múltiplos
-  equipamentos por chamado, validação de Nota Fiscal XML, fluxo de
-  envio/confirmação, portal do cliente redesenhado) — tudo documentado em
-  `CUSTOMIZACOES_OSTICKET.md`.
-- Projeto agora versionado em Git, com nome de projeto Docker fixo
-  (`osticket-zkteco`) para não depender mais do nome/local da pasta.
-
-**Lacunas conhecidas / proposta de próximos passos:**
-1. **Onboarding de ambiente novo:** hoje um clone novo do repositório não traz
-   um dump inicial (ver seção 3.2). Proposta: gerar um dump anonimizado (sem
-   dados reais de clientes) para versionar em `db/init/`, ou documentar um
-   processo de restauração a partir de um backup seguro (ex.: cofre de
-   segredos da equipe).
-2. **Migrations não automatizadas:** os arquivos em `db/migrations/` são
-   aplicados manualmente. Proposta: adotar uma ferramenta simples de migração
-   (ou um script que aplique tudo que ainda não foi marcado como aplicado) para
-   evitar depender de memória/checklist manual.
-3. **Testes do lado da equipe (staff/scp):** várias customizações no
-   `CUSTOMIZACOES_OSTICKET.md` estão marcadas como testadas só do lado do
-   cliente. Falta validação funcional completa do painel do agente.
-4. **CI básico:** sem testes automatizados hoje. Um primeiro passo de baixo
-   custo seria um workflow que só valida `docker compose config` e faz o build
-   da imagem a cada push, pegando erros de sintaxe/Dockerfile cedo.
-5. **Produção formal:** seção 11 já descreve o caminho (imagem autocontida,
-   proxy reverso/TLS, cron real); ainda não foi executado — está em plano, não
-   em produção externa.
-
----
-
-## 14. Solução de problemas
-
-| Sintoma | O que verificar |
+| Informação | Regra |
 |---|---|
-| `app` reinicia em loop no início | Banco ainda inicializando; veja `docker compose logs db`. Aguarde o *healthy*. |
-| "Unable to connect to database" | `.env` bateu com `OST_DB*`? Banco *healthy*? `docker compose logs db`. |
-| Banco não importou o dump | O volume não estava vazio. Rode `docker compose down -v` e suba de novo. |
-| Acentos errados | Confirme `--character-set-server=utf8` no compose e o dump em `utf8`. |
-| Página em branco / erro PHP | `docker compose logs app` e `docker compose exec app tail -f /var/log/apache2/error.log`. |
-| Porta 8080 ocupada | Troque `APP_PORT` no `.env` (ex.: 8090) e `docker compose up -d`. |
-| Alterou CSS e não vê mudança | Cache do navegador (Ctrl+F5) e o cache-buster `?zk...` (ver `CUSTOMIZACOES_OSTICKET.md`). |
-| Renomeei a pasta e o `docker compose ps` não mostra os containers antigos | Normal — o nome do projeto agora é fixo (`osticket-zkteco`, seção 3.1), então os containers/volume corretos continuam sendo usados independente da pasta. |
+| Departamento | **Manutenção**. |
+| Plano de SLA | SLA padrão ativo configurado no sistema; a consolidação define como padrão o único SLA ativo existente. |
+| Atribuído a | Agente autenticado que está abrindo o RMA. Cada agente recebe os chamados que ele próprio abre. |
+| Origem do chamado | Mantida internamente como telefone para compatibilidade com o cadastro do osTicket; sem seleção no formulário. |
+| Tópico de ajuda | Tópico padrão ativo, utilizado internamente. |
+| Data de vencimento manual | Não solicitada; o prazo é calculado pelo SLA. |
 
----
+Departamento e SLA também são aplicados aos novos chamados após as regras de filtragem, evitando que configurações antigas desviem o atendimento para outro setor. A atribuição ao agente conectado é específica da abertura pela equipe; não atribui um agente fictício ao cliente que abre seu próprio chamado.
 
-### Referência rápida de arquivos
-- `docker-compose.yml` — orquestra `app` + `db`; define o nome fixo do projeto (`name: osticket-zkteco`).
-- `docker/Dockerfile` — imagem PHP 8.2 + extensões do osTicket.
-- `.env` — senhas/porta (não versionar) · `.env.example` — modelo.
-- `db/init/*.sql` — dump inicial (restauração automática; ignorado pelo Git).
-- `db/migrations/*.sql` — alterações de schema aplicadas manualmente após o dump inicial.
-- `app/include/ost-config.php` — credenciais via `getenv()` (host `db`).
-- `CUSTOMIZACOES_OSTICKET.md` — log completo de customizações do core.
+O agente deve estar disponível e possuir as permissões de criação e atribuição em Manutenção. Configurações ausentes ou permissões insuficientes são informadas na abertura. As rotinas de cadastro, migração e envio dos e-mails permanecem separadas desse encaminhamento.
+
+A remoção dos departamentos antigos exige a execução do utilitário de consolidação no banco. Apenas reconstruir a imagem não remove registros existentes.
+
+## Alterações relevantes realizadas
+
+| Área | Problema corrigido ou melhoria |
+|---|---|
+| Cadastro do cliente | Campo de nascimento desativado ainda era validado como obrigatório, bloqueando a criação pelo agente. A validação agora considera os campos ativos; CPF/CNPJ continua obrigatório quando configurado. |
+| Formulário do RMA | Componente compartilhado entre cliente e equipe, com vários equipamentos, fotos, NF e declaração; retirada dos campos redundantes do agente. |
+| Migração interna | Conta com troca obrigatória de senha, equipamento recebido, exceção documental explícita e ausência de exigência de envio pelo agente. |
+| Aviso de acesso | E-mail apresenta o login, a senha inicial válida e o link do portal; falhas de envio são distinguidas de falhas na criação da conta. |
+| SMTP | Após erro de conexão ou envio, a sessão defeituosa é descartada. A próxima notificação abre uma conexão nova, evitando a sequência de falhas `Cannot issue HELO to existing session`. Isso não repete automaticamente uma mensagem que o provedor recusou. |
+| Editor e rascunhos | Corrigidos o CSRF do upload de imagens, a associação ao rascunho e a exibição das imagens inline. Preservado o ajuste de largura do editor do agente. |
+| Arquivos e persistência | NF e declaração preservadas juntas; substituição de documento cria o novo vínculo antes de retirar o anterior. Falhas parciais são informadas com o número do RMA já criado. |
+| Encaminhamento | Departamento Manutenção, SLA padrão e agente responsável definidos automaticamente na abertura pela equipe. |
+| Controle de versão | Recuperação da versão validada em Git e separação da alteração de encaminhamento em uma branch própria. |
+
+O diagnóstico, os arquivos envolvidos e os resultados detalhados dos testes anteriores estão em [Revisão de RMA, cadastro, migração e editor](docs/revisao-rma-agente-2026-09-17.md).
+
+## Arquitetura e organização
+
+| Componente | Configuração do projeto |
+|---|---|
+| Aplicação | osTicket 1.17.8 customizado, PHP 8.2 e Apache. |
+| Banco | MariaDB 10.6; prefixo de tabelas `ost_`. |
+| Containers | `osticket-app` e `osticket-db`. |
+| Projeto Compose | `osticket-zkteco`, com nome fixo independente da pasta. |
+| Volume persistente | `db_data`, normalmente identificado como `osticket-zkteco_db_data`. |
+| Publicação | Traefik compartilhado, rede externa `traefik-public`, HTTPS e roteamento pelo domínio do `.env`. |
+| Código no container | Copiado de `app/` para a imagem durante o build; o Compose atual não utiliza bind mount da aplicação. |
+| Anexos | Backend de banco do osTicket no ambiente atual, com vínculos próprios do módulo de equipamentos. |
+
+```text
+app/                         Aplicação e customizações
+  include/zk_equipment.php   Equipamentos, documentos, fotos, migração e notificações
+  include/zk_rma_routing.php Encaminhamento automático
+  scp/                      Painel da equipe
+db/init/                    Dump inicial; importado somente com volume vazio
+db/migrations/              Alterações de banco aplicadas manualmente
+docker/                     Dockerfile e configurações PHP/Apache
+scripts/                    Utilitários operacionais e testes isolados
+docs/                       Revisões e procedimentos
+docker-compose.yml          Serviços e publicação via Traefik
+.env.example                Modelo de configuração, sem credenciais reais
+README.md                   Funcionalidades e operação atual
+```
+
+O `.env`, os dumps iniciais, os backups e os logs ficam fora do Git. Um clone do repositório **não contém os dados do portal**. O Git recupera código e documentação; o backup do banco recupera chamados, contas, configurações e anexos.
+
+## Operação Docker
+
+Os comandos abaixo são para **Bash na sessão SSH do servidor**, dentro da pasta do projeto. O Compose atual já contém a configuração de produção; não depende de um arquivo `docker-compose.prod.yml` separado.
+
+### Preparação de uma instalação nova
+
+1. Disponibilizar Docker Engine e Docker Compose, a rede externa `traefik-public` e o Traefik utilizado pelo servidor.
+2. Copiar `.env.example` para `.env`, preenchendo banco, credenciais, domínio e proxies confiáveis. Manter o `.env` restrito à administração.
+3. Providenciar um dump autorizado e colocá-lo em `db/init/` **antes da primeira inicialização de um volume vazio**. O projeto não inclui um banco demonstrativo pronto para uso.
+4. Conferir quais migrations de `db/migrations/` já estão no dump. Elas não são aplicadas automaticamente em bancos existentes e não devem ser reaplicadas indiscriminadamente.
+5. Executar `sudo docker compose up -d --build` e conferir `sudo docker compose ps`.
+
+O portal do cliente fica na raiz do domínio configurado; o painel da equipe, em `/scp/`. Ajustar a **URL do helpdesk** no painel administrativo para que os links dos e-mails usem o endereço correto. O Compose atual não publica `localhost:8080`; uma instalação local sem Traefik precisa de configuração própria de portas/rede.
+
+SMTP é configurado no painel do osTicket. CAPTCHA Turnstile depende das chaves previstas no `.env`; sem essas chaves, permanece desativado. A configuração de proxies confiáveis deve corresponder à infraestrutura real. O guia complementar de publicação está em [Traefik: onboarding](traefik-onboarding-devs.md).
+
+### Publicar alterações da aplicação
+
+```bash
+cd /docker-files/centralmanutencao
+sudo docker compose build app
+sudo docker compose up -d --no-deps app
+sudo docker compose ps
+sudo docker compose logs --tail=100 app
+```
+
+Editar os arquivos no compartilhamento não atualiza um container já construído. O build incorpora o código; o `up` recria a aplicação usando a imagem atual. Um simples `restart` não incorpora os arquivos novos.
+
+Para pausar sem remover dados, usar `sudo docker compose stop app`; para retomar, `sudo docker compose start app`. As tarefas periódicas do osTicket podem ser executadas pelo agendador do servidor com `docker exec osticket-app php /var/www/html/api/cron.php`; conferir a configuração existente antes de criar agendamento duplicado.
+
+### Consolidar departamentos existentes
+
+O utilitário [zk-consolidar-manutencao.php](scripts/zk-consolidar-manutencao.php) possui **prévia sem persistência** e aplicação explícita com `--apply`. Ele exige um departamento Manutenção identificável e exatamente um SLA ativo. Redireciona vínculos e configurações dos demais departamentos antes de removê-los, preservando chamados, anexos, contas e senhas.
+
+Executar primeiro a prévia, após copiar o script para o container:
+
+```bash
+sudo docker cp scripts/zk-consolidar-manutencao.php osticket-app:/tmp/zk-consolidar-manutencao.php
+sudo docker exec osticket-app php /tmp/zk-consolidar-manutencao.php
+```
+
+A aplicação deve ocorrer com backup recente e sem gravações concorrentes da aplicação ou de tarefas agendadas. O script usa transação e cancela a operação quando encontra uma estrutura que não pode consolidar com segurança. A publicação do código **não executa esse script automaticamente**. O procedimento final de aplicação deve seguir o documento específico de consolidação entregue com esta alteração.
+
+### Backup do banco
+
+O backup deve incluir os anexos armazenados no banco. Para gerar um arquivo datado:
+
+```bash
+mkdir -p backups
+backup_file="backups/backup_$(date +%Y%m%d_%H%M%S).sql"
+sudo docker exec osticket-db sh -c 'exec mariadb-dump -uroot -p"$MARIADB_ROOT_PASSWORD" --single-transaction --hex-blob --default-character-set=utf8 "$MARIADB_DATABASE"' > "$backup_file"
+test -s "$backup_file" && ls -lh "$backup_file"
+```
+
+Confirmar que o comando terminou sem erro e manter uma cópia fora do servidor. Arquivo não vazio, sozinho, não comprova um backup restaurável; validar a restauração em ambiente isolado.
+
+### Restaurar um backup
+
+Restaurar substitui dados do banco selecionado. Usar o arquivo conferido e manter a aplicação e os agendamentos parados durante a importação:
+
+```bash
+sudo docker compose stop app
+sudo docker exec -i osticket-db sh -c 'exec mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" "$MARIADB_DATABASE"' < backups/ARQUIVO_CONFERIDO.sql
+# Após confirmar que a importação terminou sem erro:
+sudo docker compose start app
+```
+
+Esses exemplos usam redirecionamento do Bash; não são comandos de restauração para Windows PowerShell. Não remover o volume para atualizar a aplicação, trocar credenciais ou importar um backup. As variáveis de inicialização do MariaDB não alteram automaticamente a senha de um usuário que já existe no banco.
+
+### Limpar imagens órfãs e cache de build
+
+```bash
+sudo docker system df
+sudo docker image prune -f
+sudo docker builder prune -af
+sudo docker system df
+```
+
+`image prune` remove imagens sem tag e sem uso; `builder prune` limpa o cache de construção não utilizado. Os comandos preservam containers e volumes, mas o próximo build pode demorar mais. Antes da limpeza, manter identificada a imagem que será usada em eventual reversão. **Não usar `docker compose down -v` nem `docker volume prune` para essa manutenção**, pois o banco depende do volume persistente.
+
+## E-mails e diagnóstico
+
+O painel de **Eventos do Sistema** reúne o resumo `ZK-MIGRACAO` e os erros do serviço de e-mail. Os títulos podem estar traduzidos; ao consultar o banco, um filtro somente por `Mailer` pode ocultar registros. Um erro antigo permanece no histórico mesmo após a correção; conferir data/hora e novas tentativas.
+
+| Situação | Verificação |
+|---|---|
+| RMA criado com pendência de aviso | A conta e o chamado já existem. Conferir remetente, SMTP e registros do mesmo horário. |
+| `Bad address syntax` | Conferir os endereços usados no envio recusado; corrigir a sessão SMTP não torna válido um endereço incorreto. |
+| `Cannot issue HELO to existing session` | Conferir se a imagem publicada contém a correção em `app/include/class.mail.php`. |
+| Mudança de código não aparece | Conferir branch, rebuild, recriação do container e cache do navegador. |
+| Falha de banco | Conferir saúde do serviço `db`, credenciais e logs; preservar o volume existente. |
+| Foto ou documento não foi salvo | Conferir o aviso do RMA e os eventos `ZK-RMA`; revisar o chamado existente antes de abrir outro. |
+
+Para reenviar o aviso de acesso de uma conta ainda com senha provisória válida, usar o utilitário CLI abaixo. Substituir `NUMERO_RMA` pelo número exibido no portal. A primeira execução mostra a prévia; apenas a segunda solicita envio:
+
+```bash
+sudo docker cp scripts/zk-migration-mail-retry.php osticket-app:/tmp/zk-migration-mail-retry.php
+sudo docker exec osticket-app php /tmp/zk-migration-mail-retry.php NUMERO_RMA
+sudo docker exec osticket-app php /tmp/zk-migration-mail-retry.php NUMERO_RMA --send
+```
+
+O utilitário não cria conta ou RMA e não redefine senha. Se a senha já tiver sido trocada, a conta estiver bloqueada ou não estiver confirmada, ele recusa o reenvio das credenciais iniciais. A aceitação pelo transporte deve ser acompanhada da conferência de recebimento pelo cliente.
+
+## Validação e limites conhecidos
+
+Na recuperação da versão validada foram aprovadas verificações de sintaxe, cadastro, senha provisória, renderização, **18 cenários HTTP de RMA**, **23 verificações de e-mail** e **31 verificações SMTP** em ambiente isolado. Os testes cobrem documentos, fotos, vínculo ao proprietário, falhas de persistência, conteúdo das credenciais e recuperação após recusas SMTP. Nenhum e-mail externo foi enviado por esses testes. O responsável confirmou posteriormente o recebimento real dos dois avisos em produção.
+
+Os scripts de revisão estão em `scripts/zk-rma-review.php`, `scripts/zk-rma-http-review.php`, `scripts/zk-rma-http-runner.php`, `scripts/zk-migration-mail-review.php` e `scripts/zk-migration-smtp-review.php`. Eles usam fixtures e proteções de ambiente; **não são endpoints de produção e não devem ser copiados para a pasta pública da aplicação**. A revisão específica de encaminhamento usa `scripts/zk-rma-routing-review.php`.
+
+A alteração de encaminhamento e o utilitário de consolidação ainda precisam concluir a validação de integração desta entrega. Os resultados anteriores listados acima referem-se à versão recuperada; não comprovam a execução da nova consolidação no banco de produção.
+
+Após publicar uma alteração, conferir no navegador:
+
+1. Abertura por dois agentes diferentes, verificando Manutenção, SLA padrão e responsável correspondente.
+2. Cliente existente e cliente novo pelo modal, com documentos e fotos.
+3. Migração com equipamento recebido, login provisório, troca de senha e recebimento dos dois avisos.
+4. Preservação do envio no portal do cliente e ausência desse grupo na abertura pelo agente.
+5. Resposta com imagem, rascunho, anexos e consulta posterior do mesmo RMA.
+6. Logs da aplicação e do portal, considerando somente os novos registros da validação.
+
+Não existe uma transação única envolvendo cadastro, ticket, equipamentos, arquivos e notificações. Uma falha pode deixar o chamado criado com pendências; os avisos e logs permitem identificar e corrigir esse estado. A consolidação de departamentos possui sua própria transação, independente da abertura de RMA. As migrations de banco continuam manuais, e os testes isolados não substituem a homologação de navegador, proxy e provedor de e-mail.
+
+## Controle de versão e continuidade do trabalho
+
+O projeto já possui repositório Git local. O ponto de recuperação do fluxo validado é a branch **`recovery/rma-validado-20260917`**, commit **`44767e2`**. A alteração de encaminhamento foi separada em **`feat/rma-encaminhamento-manutencao`**.
+
+As orientações para futuras alterações e atuação de agentes de IA estão em [AGENTS.md](AGENTS.md), incluindo preservação do fluxo validado, controle de versão e cuidados com o banco de produção.
+
+Antes de editar, inclusive com outro agente de IA:
+
+```bash
+git status --short
+git branch --show-current
+git log -5 --oneline
+git diff --stat
+```
+
+Preservar alterações não commitadas de outros trabalhos. Criar uma branch para cada mudança, conferir o diff e registrar somente os arquivos relacionados após a validação. Não usar `git add .` sem revisar os arquivos, nem `reset --hard` ou substituição completa da pasta para corrigir um ponto específico.
+
+```bash
+git switch -c feat/descricao-da-alteracao
+git diff
+git add CAMINHO_DO_ARQUIVO_REVISADO
+git commit -m "Descreve a mudança e seu efeito"
+```
+
+Para desfazer uma alteração já registrada, avaliar `git revert COMMIT_DA_ALTERACAO`, preservando o histórico. Uma reversão de código exige novo build e **não reverte alterações já aplicadas ao banco**. A consolidação de departamentos, por exemplo, deve ter seu próprio backup anterior.
+
+O Git local oferece pontos de recuperação, mas não impede que outra ferramenta modifique arquivos e não substitui cópia externa do repositório e dos backups. Mudanças no core do osTicket devem ser revisadas antes de qualquer atualização da versão original; sobrescrever `app/` com uma distribuição limpa elimina as customizações.
